@@ -1,0 +1,554 @@
+<title>아날렘마 실험실</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Noto+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --bg-deep: #060912;
+    --bg: #0a0e1a;
+    --surface: #10162590;
+    --surface-solid: #10182a;
+    --surface-2: #182238;
+    --border: #263255;
+    --text: #e7ecf7;
+    --text-dim: #8b96b8;
+    --text-faint: #576088;
+    --accent-sun: #f0a94e;
+    --accent-sun-dim: #f0a94e99;
+    --accent-sun-soft: rgba(240, 169, 78, 0.12);
+    --accent-compare: #57b8ad;
+    --grid-line: #1e2842;
+    --star: #ffffff;
+  }
+
+  * { box-sizing: border-box; }
+
+  html { background: var(--bg-deep); }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background:
+      radial-gradient(1px 1px at 8% 15%, var(--star), transparent),
+      radial-gradient(1px 1px at 22% 68%, var(--star), transparent),
+      radial-gradient(1.5px 1.5px at 35% 22%, var(--star), transparent),
+      radial-gradient(1px 1px at 48% 78%, var(--star), transparent),
+      radial-gradient(1px 1px at 62% 12%, var(--star), transparent),
+      radial-gradient(1.5px 1.5px at 75% 55%, var(--star), transparent),
+      radial-gradient(1px 1px at 85% 30%, var(--star), transparent),
+      radial-gradient(1px 1px at 93% 82%, var(--star), transparent),
+      radial-gradient(1px 1px at 15% 92%, var(--star), transparent),
+      radial-gradient(1.5px 1.5px at 58% 90%, var(--star), transparent),
+      radial-gradient(circle at 50% -10%, #16203a 0%, var(--bg) 45%, var(--bg-deep) 100%);
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-attachment: fixed;
+    background-color: var(--bg-deep);
+    color: var(--text);
+    font-family: 'Noto Sans KR', sans-serif;
+    padding: 30px 20px 50px;
+  }
+
+  .wrap { max-width: 1160px; margin: 0 auto; }
+
+  header {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    margin-bottom: 26px;
+    flex-wrap: wrap;
+  }
+
+  h1 {
+    font-family: 'Cormorant Garamond', 'Noto Sans KR', serif;
+    font-style: italic;
+    font-weight: 600;
+    font-size: clamp(28px, 4vw, 40px);
+    margin: 0;
+    letter-spacing: 0.01em;
+  }
+
+  .subtitle {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11.5px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+  }
+
+  .layout {
+    display: grid;
+    grid-template-columns: 288px 1fr;
+    gap: 18px;
+    align-items: start;
+  }
+
+  @media (max-width: 860px) {
+    .layout { grid-template-columns: 1fr; }
+  }
+
+  .panel {
+    background: var(--surface);
+    backdrop-filter: blur(6px);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+  }
+
+  .panel-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10.5px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    margin: 0 0 12px;
+  }
+
+  .presets {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 22px;
+  }
+
+  .chip {
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 12.5px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: var(--surface-2);
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: border-color 0.15s, color 0.15s;
+  }
+  .chip:hover { border-color: var(--accent-sun-dim); color: var(--text); }
+  .chip:focus-visible { outline: 2px solid var(--accent-sun); outline-offset: 2px; }
+  .chip.active { border-color: var(--accent-sun); color: var(--accent-sun); }
+
+  .field { margin-bottom: 20px; }
+
+  .field-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 7px;
+    font-size: 13.5px;
+  }
+
+  .field-value {
+    font-family: 'IBM Plex Mono', monospace;
+    font-variant-numeric: tabular-nums;
+    font-size: 13px;
+    color: var(--accent-sun);
+  }
+
+  input[type="range"] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 3px;
+    border-radius: 2px;
+    background: linear-gradient(to right, var(--accent-sun) 0%, var(--accent-sun) var(--pct, 50%), var(--surface-2) var(--pct, 50%), var(--surface-2) 100%);
+    outline: none;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--accent-sun);
+    border: 2px solid var(--bg);
+    box-shadow: 0 0 0 1px var(--border);
+    cursor: pointer;
+  }
+  input[type="range"]::-moz-range-thumb {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--accent-sun);
+    border: 2px solid var(--bg);
+    cursor: pointer;
+  }
+  input[type="range"]:focus-visible::-webkit-slider-thumb {
+    outline: 2px solid var(--accent-sun);
+    outline-offset: 2px;
+  }
+
+  .toggle-row {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin-top: 22px;
+    padding-top: 18px;
+    border-top: 1px solid var(--border);
+    font-size: 13px;
+    color: var(--text-dim);
+  }
+  .toggle-row input { accent-color: var(--accent-compare); width: 15px; height: 15px; cursor: pointer; }
+  .toggle-row label { cursor: pointer; }
+  .swatch {
+    display: inline-block;
+    width: 9px; height: 9px;
+    border-radius: 50%;
+    margin-right: 5px;
+    vertical-align: middle;
+  }
+
+  .chart-card {
+    background: var(--surface);
+    backdrop-filter: blur(6px);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 18px 18px 8px;
+  }
+
+  .chart-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 4px;
+    flex-wrap: wrap;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--text-faint);
+  }
+
+  .legend { display: flex; gap: 14px; }
+
+  svg#chart { width: 100%; height: auto; display: block; }
+
+  .axis-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    fill: var(--text-faint);
+  }
+  .compass-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    fill: var(--text-dim);
+    font-weight: 600;
+  }
+  .grid-line { stroke: var(--grid-line); stroke-width: 1; }
+
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 10px;
+    margin: 14px 0 10px;
+  }
+
+  .stat {
+    background: var(--surface-2);
+    border-radius: 10px;
+    padding: 11px 13px;
+  }
+  .stat-label { font-size: 11px; color: var(--text-faint); margin-bottom: 3px; }
+  .stat-value {
+    font-family: 'IBM Plex Mono', monospace;
+    font-variant-numeric: tabular-nums;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--accent-sun);
+  }
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>아날렘마 실험실</h1>
+    <span class="subtitle">Analemma Lab</span>
+  </header>
+
+  <div class="layout">
+    <div class="panel">
+      <p class="panel-label">행성 프리셋</p>
+      <div class="presets" id="presets"></div>
+
+      <p class="panel-label">파라미터</p>
+
+      <div class="field">
+        <div class="field-label"><span>자전축 기울기</span><span class="field-value" id="val-eps">23.4°</span></div>
+        <input type="range" id="eps" min="0" max="90" step="0.1" value="23.4">
+      </div>
+
+      <div class="field">
+        <div class="field-label"><span>이심률</span><span class="field-value" id="val-ecc">0.017</span></div>
+        <input type="range" id="ecc" min="0" max="0.9" step="0.001" value="0.017">
+      </div>
+
+      <div class="field">
+        <div class="field-label"><span>근일점 시기</span><span class="field-value" id="val-peri">283°</span></div>
+        <input type="range" id="peri" min="0" max="360" step="1" value="283">
+      </div>
+
+      <div class="field">
+        <div class="field-label"><span>관측 위도</span><span class="field-value" id="val-lat">30°N</span></div>
+        <input type="range" id="lat" min="-89" max="89" step="1" value="30">
+      </div>
+
+      <div class="toggle-row">
+        <input type="checkbox" id="compareToggle">
+        <label for="compareToggle"><span class="swatch" style="background:var(--accent-compare)"></span>0°/60°/90°N과 겹쳐보기</label>
+      </div>
+    </div>
+
+    <div class="chart-card">
+      <div class="chart-top">
+        <span>Az–Alt</span>
+        <div class="legend" id="legend"></div>
+      </div>
+      <svg id="chart" viewBox="0 0 720 440" preserveAspectRatio="xMidYMid meet"></svg>
+
+      <div class="stats-row">
+        <div class="stat"><div class="stat-label">세로 폭</div><div class="stat-value" id="stat-alt">–</div></div>
+        <div class="stat"><div class="stat-label">가로 폭</div><div class="stat-value" id="stat-az">–</div></div>
+        <div class="stat"><div class="stat-label">균시차 범위</div><div class="stat-value" id="stat-eot">–</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  const PRESETS = [
+    { name: "지구", eps: 23.44, ecc: 0.0167, peri: 283 },
+    { name: "수성", eps: 0.03, ecc: 0.206, peri: 30 },
+    { name: "금성", eps: 2.64, ecc: 0.0068, peri: 55 },
+    { name: "화성", eps: 25.19, ecc: 0.0934, peri: 286 },
+    { name: "목성", eps: 3.13, ecc: 0.0489, peri: 275 },
+    { name: "토성", eps: 26.73, ecc: 0.0565, peri: 340 },
+    { name: "천왕성", eps: 97.77, ecc: 0.0472, peri: 97 },
+    { name: "해왕성", eps: 28.32, ecc: 0.0086, peri: 276 },
+  ];
+
+  const el = {
+    eps: document.getElementById("eps"),
+    ecc: document.getElementById("ecc"),
+    peri: document.getElementById("peri"),
+    lat: document.getElementById("lat"),
+    valEps: document.getElementById("val-eps"),
+    valEcc: document.getElementById("val-ecc"),
+    valPeri: document.getElementById("val-peri"),
+    valLat: document.getElementById("val-lat"),
+    compareToggle: document.getElementById("compareToggle"),
+    chart: document.getElementById("chart"),
+    legend: document.getElementById("legend"),
+    statAlt: document.getElementById("stat-alt"),
+    statAz: document.getElementById("stat-az"),
+    statEot: document.getElementById("stat-eot"),
+    presets: document.getElementById("presets"),
+  };
+
+  function keplerE(M, e) {
+    let E = M;
+    for (let i = 0; i < 60; i++) {
+      const dE = (E - e * Math.sin(E) - M) / (1 - e * Math.cos(E));
+      E -= dE;
+      if (Math.abs(dE) < 1e-10) break;
+    }
+    return E;
+  }
+
+  function computeCurve(epsDeg, e, periDeg, latDeg, N) {
+    N = N || 240;
+    const eps = (epsDeg * Math.PI) / 180;
+    const peri = (periDeg * Math.PI) / 180;
+    const phi = (latDeg * Math.PI) / 180;
+    const az = [];
+    const alt = [];
+    for (let i = 0; i < N; i++) {
+      const M = (2 * Math.PI * i) / N;
+      const E = keplerE(M, e);
+      const nu = 2 * Math.atan2(Math.sqrt(1 + e) * Math.sin(E / 2), Math.sqrt(1 - e) * Math.cos(E / 2));
+      const lambda = nu + peri;
+      const sinDelta = Math.sin(eps) * Math.sin(lambda);
+      const delta = Math.asin(Math.max(-1, Math.min(1, sinDelta)));
+      const alpha = Math.atan2(Math.cos(eps) * Math.sin(lambda), Math.cos(lambda));
+      const meanLon = M + peri;
+      let eot = meanLon - alpha;
+      eot = Math.atan2(Math.sin(eot), Math.cos(eot));
+      const H = eot;
+      const sinAlt = Math.sin(phi) * Math.sin(delta) + Math.cos(phi) * Math.cos(delta) * Math.cos(H);
+      const altVal = Math.asin(Math.max(-1, Math.min(1, sinAlt)));
+      let cosAz = (Math.sin(delta) - Math.sin(phi) * Math.sin(altVal)) / (Math.cos(phi) * Math.cos(altVal) + 1e-9);
+      cosAz = Math.max(-1, Math.min(1, cosAz));
+      let azVal = Math.acos(cosAz);
+      if (Math.sin(H) > 0) azVal = 2 * Math.PI - azVal;
+      az.push((azVal * 180) / Math.PI);
+      alt.push((altVal * 180) / Math.PI);
+    }
+    return { az, alt };
+  }
+
+  function unwrap(arr) {
+    const out = [arr[0]];
+    let offset = 0;
+    for (let i = 1; i < arr.length; i++) {
+      let diff = arr[i] - arr[i - 1];
+      if (diff > 180) offset -= 360;
+      else if (diff < -180) offset += 360;
+      out.push(arr[i] + offset);
+    }
+    return out;
+  }
+
+  function css(name) {
+    return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  }
+
+  // Display only: the slider is internally capped at ±89° to avoid the
+  // azimuth singularity exactly at the pole, but reads as a clean 90°.
+  function displayLat(latDeg) {
+    const shown = Math.abs(latDeg) >= 89 ? Math.sign(latDeg) * 90 : latDeg;
+    return shown >= 0 ? shown.toFixed(0) + "°N" : Math.abs(shown).toFixed(0) + "°S";
+  }
+
+  function buildPath(azArr, altArr, xScale, yScale) {
+    let d = "";
+    for (let i = 0; i < azArr.length; i++) {
+      d += (i === 0 ? "M" : "L") + xScale(azArr[i]).toFixed(1) + "," + yScale(altArr[i]).toFixed(1) + " ";
+    }
+    return d;
+  }
+
+  const COMPASS = [
+    { deg: 0, label: "N" },
+    { deg: 90, label: "E" },
+    { deg: 180, label: "S" },
+    { deg: 270, label: "W" },
+    { deg: 360, label: "N" },
+  ];
+
+  function render() {
+    const epsDeg = parseFloat(el.eps.value);
+    const ecc = parseFloat(el.ecc.value);
+    const periDeg = parseFloat(el.peri.value);
+    const latDeg = parseFloat(el.lat.value);
+
+    el.eps.style.setProperty("--pct", ((epsDeg - 0) / 90) * 100 + "%");
+    el.ecc.style.setProperty("--pct", ((ecc - 0) / 0.9) * 100 + "%");
+    el.peri.style.setProperty("--pct", ((periDeg - 0) / 360) * 100 + "%");
+    el.lat.style.setProperty("--pct", ((latDeg + 89) / 178) * 100 + "%");
+
+    el.valEps.textContent = epsDeg.toFixed(1) + "°";
+    el.valEcc.textContent = ecc.toFixed(3);
+    el.valPeri.textContent = periDeg.toFixed(0) + "°";
+    el.valLat.textContent = displayLat(latDeg);
+
+    const main = computeCurve(epsDeg, ecc, periDeg, latDeg);
+    const mainAzU = unwrap(main.az);
+
+    const compareOn = el.compareToggle.checked;
+    const refLats = [0, 60, 89];
+    const refs = compareOn
+      ? refLats.map((L) => {
+          const c = computeCurve(epsDeg, ecc, periDeg, L);
+          return { lat: L, az: unwrap(c.az), alt: c.alt };
+        })
+      : [];
+
+    let allAz = mainAzU.slice();
+    let allAlt = main.alt.slice();
+    refs.forEach((r) => { allAz = allAz.concat(r.az); allAlt = allAlt.concat(r.alt); });
+    const azMin = Math.min(...allAz), azMax = Math.max(...allAz);
+    const altMin = Math.min(...allAlt), altMax = Math.max(...allAlt);
+    const azPad = Math.max((azMax - azMin) * 0.08, 3);
+    const altPad = Math.max((altMax - altMin) * 0.1, 3);
+
+    const W = 720, H = 440;
+    const marginL = 40, marginR = 16, marginT = 14, marginB = 30;
+    const plotW = W - marginL - marginR;
+    const plotH = H - marginT - marginB;
+
+    const azLo = azMin - azPad, azHi = azMax + azPad;
+    const altLo = altMin - altPad, altHi = altMax + altPad;
+    const xScale = (v) => marginL + ((v - azLo) / (azHi - azLo)) * plotW;
+    const yScale = (v) => marginT + plotH - ((v - altLo) / (altHi - altLo)) * plotH;
+
+    const accentSun = css("--accent-sun");
+    const accentCompare = css("--accent-compare");
+    const gridLine = css("--grid-line");
+    const textDim = css("--text-dim");
+    const bg = css("--bg");
+
+    let svg = "";
+    const nTicks = 5;
+    for (let i = 0; i <= nTicks; i++) {
+      const av = altLo + (altHi - altLo) * (i / nTicks);
+      const y = yScale(av);
+      svg += `<line x1="${marginL}" y1="${y}" x2="${W - marginR}" y2="${y}" class="grid-line" stroke="${gridLine}"/>`;
+      svg += `<text x="${marginL - 7}" y="${y + 3}" text-anchor="end" class="axis-label">${av.toFixed(0)}°</text>`;
+    }
+    for (let i = 0; i <= nTicks; i++) {
+      const azv = azLo + (azHi - azLo) * (i / nTicks);
+      const x = xScale(azv);
+      svg += `<line x1="${x}" y1="${marginT}" x2="${x}" y2="${H - marginB}" class="grid-line" stroke="${gridLine}"/>`;
+      svg += `<text x="${x}" y="${H - marginB + 15}" text-anchor="middle" class="axis-label">${azv.toFixed(0)}°</text>`;
+    }
+    COMPASS.forEach((c) => {
+      if (c.deg >= azLo && c.deg <= azHi) {
+        const x = xScale(c.deg);
+        svg += `<text x="${x}" y="${marginT + 12}" text-anchor="middle" class="compass-label">${c.label}</text>`;
+      }
+    });
+
+    refs.forEach((r) => {
+      const d = buildPath(r.az, r.alt, xScale, yScale);
+      svg += `<path d="${d}" fill="none" stroke="${accentCompare}" stroke-width="1.3" stroke-opacity="0.5" stroke-dasharray="3 2"/>`;
+    });
+
+    const dMain = buildPath(mainAzU, main.alt, xScale, yScale);
+    svg += `<path d="${dMain}" fill="none" stroke="${accentSun}" stroke-width="2.2" stroke-linejoin="round"/>`;
+    svg += `<circle cx="${xScale(mainAzU[0])}" cy="${yScale(main.alt[0])}" r="4" fill="${textDim}" stroke="${bg}" stroke-width="1.5"/>`;
+
+    el.chart.setAttribute("viewBox", `0 0 ${W} ${H}`);
+    el.chart.innerHTML = svg;
+
+    let legendHtml = `<span><span class="swatch" style="background:${accentSun}"></span>${el.valLat.textContent}</span>`;
+    if (compareOn) legendHtml += `<span><span class="swatch" style="background:${accentCompare}"></span>0°/60°/90°N</span>`;
+    el.legend.innerHTML = legendHtml;
+
+    el.statAlt.textContent = (altMax - altMin).toFixed(1) + "°";
+    el.statAz.textContent = (Math.max(...mainAzU) - Math.min(...mainAzU)).toFixed(1) + "°";
+
+    const H_deg = [];
+    const eps = (epsDeg * Math.PI) / 180;
+    const peri = (periDeg * Math.PI) / 180;
+    for (let i = 0; i < 240; i++) {
+      const M = (2 * Math.PI * i) / 240;
+      const E = keplerE(M, ecc);
+      const nu = 2 * Math.atan2(Math.sqrt(1 + ecc) * Math.sin(E / 2), Math.sqrt(1 - ecc) * Math.cos(E / 2));
+      const lambda = nu + peri;
+      const alpha = Math.atan2(Math.cos(eps) * Math.sin(lambda), Math.cos(lambda));
+      const meanLon = M + peri;
+      let eot = meanLon - alpha;
+      eot = Math.atan2(Math.sin(eot), Math.cos(eot));
+      H_deg.push((eot * 180) / Math.PI);
+    }
+    el.statEot.textContent = (Math.max(...H_deg) - Math.min(...H_deg)).toFixed(1) + "°";
+  }
+
+  [el.eps, el.ecc, el.peri, el.lat].forEach((input) => input.addEventListener("input", () => {
+    document.querySelectorAll(".chip.active").forEach((c) => c.classList.remove("active"));
+    render();
+  }));
+  el.compareToggle.addEventListener("change", render);
+
+  PRESETS.forEach((p, idx) => {
+    const btn = document.createElement("button");
+    btn.className = "chip" + (idx === 0 ? " active" : "");
+    btn.textContent = p.name;
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".chip.active").forEach((c) => c.classList.remove("active"));
+      btn.classList.add("active");
+      el.eps.value = p.eps;
+      el.ecc.value = p.ecc;
+      el.peri.value = p.peri;
+      render();
+    });
+    el.presets.appendChild(btn);
+  });
+
+  render();
+})();
+</script>
