@@ -93,41 +93,40 @@
 
   .wrap { position: relative; z-index: 1; max-width: 1320px; margin: 0 auto; padding: 0 20px 40px; }
 
-  /* ── Status rail ─────────────────────────────────────────────── */
+  /* ── Status rail (its own window, sits above the console) ──────── */
   .status-rail {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 16px;
     flex-wrap: wrap;
-    padding: 22px 4px;
-    border-bottom: 1px solid var(--line-soft);
-    margin-bottom: 22px;
+    padding: 18px 26px;
+    margin-bottom: 18px;
   }
 
-  .brand { display: flex; align-items: center; gap: 12px; }
+  .brand { display: flex; align-items: center; gap: 16px; }
 
   .brand-badge {
     display: grid;
     place-items: center;
-    width: 36px; height: 36px;
-    border-radius: 4px;
+    width: 52px; height: 52px;
+    border-radius: 8px;
     border: 1px solid rgba(240, 169, 78, 0.4);
     background: var(--amber-soft);
     color: var(--amber);
     flex: none;
   }
-  .brand-badge svg { width: 18px; height: 18px; }
+  .brand-badge svg { width: 27px; height: 27px; }
 
   .brand-title {
     font-weight: 700;
-    font-size: 19px;
+    font-size: 30px;
     letter-spacing: 0;
     color: var(--text);
-    line-height: 1.3;
+    line-height: 1.25;
   }
   .brand-sub {
-    font-size: 12px;
+    font-size: 13.5px;
     font-weight: 300;
     letter-spacing: 0.03em;
     color: var(--text-faint);
@@ -135,8 +134,8 @@
 
   .status-chips { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
   .chip-item {
-    display: flex; align-items: baseline; gap: 6px;
-    font-size: 13px;
+    display: flex; align-items: baseline; gap: 7px;
+    font-size: 14px;
     font-weight: 300;
     color: var(--text-faint);
   }
@@ -188,7 +187,7 @@
     letter-spacing: 0;
     color: var(--text-dim);
   }
-  .section-label svg { width: 14px; height: 14px; color: var(--amber); opacity: 0.85; }
+  .section-label svg { width: 16px; height: 16px; color: var(--amber); opacity: 0.85; }
   .section-label .label-right {
     font-size: 12.5px;
     font-weight: 300;
@@ -199,14 +198,19 @@
   /* ── Console grid ────────────────────────────────────────────── */
   .console {
     display: grid;
+    align-items: stretch;
     gap: 16px;
     grid-template-columns: 1fr;
     grid-template-areas: "profiles" "chart" "controls";
   }
 
-  .profiles-col { grid-area: profiles; min-width: 0; }
-  .viewport-col { grid-area: chart; min-width: 0; }
+  .profiles-col { grid-area: profiles; min-width: 0; display: flex; flex-direction: column; }
+  .viewport-col { grid-area: chart; min-width: 0; display: flex; flex-direction: column; }
   .controls-col { grid-area: controls; min-width: 0; display: flex; flex-direction: column; gap: 16px; }
+
+  /* Each column's trailing panel grows to fill the row, so every window in
+     a row bottoms out flush instead of leaving dead space underneath. */
+  .viewport-panel, .profile-detail, .telemetry-panel { flex: 1; }
 
   /* ── Profile icon grid ──────────────────────────────────────── */
   .profile-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
@@ -216,8 +220,8 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 5px;
-    padding: 10px 4px;
+    gap: 6px;
+    padding: 13px 4px;
     border-radius: 10px;
     border: 1px solid var(--line-soft);
     background: rgba(13, 18, 29, 0.55);
@@ -233,22 +237,28 @@
     box-shadow: 0 0 0 1px rgba(240, 169, 78, 0.2);
   }
   .tile-icon {
-    width: 32px; height: 32px;
+    width: 42px; height: 42px;
     border-radius: 50%;
     display: grid;
     place-items: center;
-    font-size: 16px;
     line-height: 1;
     border: 1px solid var(--line-soft);
   }
+  .tile-icon svg { width: 24px; height: 24px; }
   .tile-name {
-    font-size: 12.5px;
+    font-size: 13.5px;
     font-weight: 500;
     color: var(--text-dim);
   }
   .profile-tile.active .tile-name { color: var(--text); font-weight: 700; }
 
-  .profile-detail { margin-top: 10px; padding: 13px 15px; }
+  .profile-detail {
+    margin-top: 10px;
+    padding: 13px 15px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
   .profile-detail-head { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
   .profile-detail-name { font-size: 16px; font-weight: 700; color: var(--text); }
   .profile-detail-params { font-size: 12.5px; font-weight: 500; color: var(--amber); }
@@ -419,7 +429,7 @@
 <div class="eng-grid" aria-hidden="true"></div>
 
 <div class="wrap">
-  <header class="status-rail">
+  <header class="status-rail panel bracket">
     <div class="brand">
       <div class="brand-badge">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="2" fill="currentColor" stroke="none"/><ellipse cx="12" cy="12" rx="10" ry="4.2"/><ellipse cx="12" cy="12" rx="10" ry="4.2" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="10" ry="4.2" transform="rotate(120 12 12)"/></svg>
@@ -431,8 +441,6 @@
     </div>
     <div class="status-chips">
       <span class="chip-item"><span class="live-dot"></span>실시간 계산</span>
-      <span class="chip-item">PRESET <b id="chip-preset">지구</b></span>
-      <span class="chip-item">LAT <b id="chip-lat">30°N</b></span>
       <span class="chip-item">LOCAL <b id="chip-clock">00:00:00</b></span>
     </div>
   </header>
@@ -545,15 +553,26 @@
 
 <script>
 (function () {
+  const ICONS = {
+    mercury: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="7"/><circle cx="9.3" cy="10.2" r="0.9" fill="currentColor" stroke="none"/><circle cx="14.2" cy="9.6" r="0.7" fill="currentColor" stroke="none"/><circle cx="11.2" cy="14.8" r="0.8" fill="currentColor" stroke="none"/></svg>',
+    venus: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="7"/><path d="M7.8 10.3c1.5 1.3 3.4 1.9 5.2 1.5"/><path d="M8.3 14c1.7 1 3.6 1 5.2 0" opacity="0.6"/></svg>',
+    earth: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="7"/><line x1="9.4" y1="4.8" x2="14.6" y2="19.2"/></svg>',
+    mars: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="7"/><path d="M9.1 6.9a4.2 4.2 0 0 1 5.8 0"/><circle cx="18.4" cy="7.2" r="1" fill="currentColor" stroke="none"/></svg>',
+    jupiter: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="7"/><line x1="5.68" y1="9" x2="18.32" y2="9"/><line x1="5" y1="12" x2="19" y2="12"/><line x1="5.68" y1="15" x2="18.32" y2="15"/></svg>',
+    saturn: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="5.2"/><ellipse cx="12" cy="12" rx="10.5" ry="3" transform="rotate(-18 12 12)"/></svg>',
+    uranus: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="5.2"/><ellipse cx="12" cy="12" rx="9" ry="1.6" transform="rotate(80 12 12)"/></svg>',
+    neptune: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="7"/><line x1="5.46" y1="9.5" x2="18.54" y2="9.5" opacity="0.7"/><line x1="5.46" y1="14.5" x2="18.54" y2="14.5" opacity="0.7"/></svg>',
+  };
+
   const PRESETS = [
-    { name: "지구", symbol: "♁", eps: 23.44, ecc: 0.0167, peri: 283, swatch: "#4a90e2", blurb: "표준적인 8자형 아날렘마 — 자전축 기울기와 낮은 이심률이 균형을 이룹니다." },
-    { name: "수성", symbol: "☿", eps: 0.03, ecc: 0.206, peri: 30, swatch: "#b8b0a4", blurb: "태양계 최대 이심률(0.206). 기울기가 거의 없어 눈물방울에 가까운 궤적." },
-    { name: "금성", symbol: "♀", eps: 2.64, ecc: 0.0068, peri: 55, swatch: "#e8cf9c", blurb: "기울기·이심률 모두 0에 가까워 폭이 거의 없는 실낱같은 궤적." },
-    { name: "화성", symbol: "♂", eps: 25.19, ecc: 0.0934, peri: 286, swatch: "#c1552c", blurb: "지구보다 큰 기울기와 이심률이 겹쳐 뚜렷하게 비대칭인 8자형." },
-    { name: "목성", symbol: "♃", eps: 3.13, ecc: 0.0489, peri: 275, swatch: "#d8b384", blurb: "기울기가 3°에 불과해 세로로 매우 좁게 눌린 곡선." },
-    { name: "토성", symbol: "♄", eps: 26.73, ecc: 0.0565, peri: 340, swatch: "#e8d3a0", blurb: "지구와 비슷한 기울기지만 이심률이 조금 더 커 폭이 넓습니다." },
-    { name: "천왕성", symbol: "♅", eps: 97.77, ecc: 0.0472, peri: 97, swatch: "#9fd8d8", blurb: "자전축이 97.8°나 기울어 거의 누운 채 공전 — 완전히 다른 패턴." },
-    { name: "해왕성", symbol: "♆", eps: 28.32, ecc: 0.0086, peri: 276, swatch: "#5b7fe0", blurb: "이심률이 가장 작은 행성 중 하나로 대칭에 가까운 매끈한 곡선." },
+    { name: "지구", icon: ICONS.earth, eps: 23.44, ecc: 0.0167, peri: 283, swatch: "#4a90e2", blurb: "표준적인 8자형 아날렘마 — 자전축 기울기와 낮은 이심률이 균형을 이룹니다." },
+    { name: "수성", icon: ICONS.mercury, eps: 0.03, ecc: 0.206, peri: 30, swatch: "#b8b0a4", blurb: "태양계 최대 이심률(0.206). 기울기가 거의 없어 눈물방울에 가까운 궤적." },
+    { name: "금성", icon: ICONS.venus, eps: 2.64, ecc: 0.0068, peri: 55, swatch: "#e8cf9c", blurb: "기울기·이심률 모두 0에 가까워 폭이 거의 없는 실낱같은 궤적." },
+    { name: "화성", icon: ICONS.mars, eps: 25.19, ecc: 0.0934, peri: 286, swatch: "#c1552c", blurb: "지구보다 큰 기울기와 이심률이 겹쳐 뚜렷하게 비대칭인 8자형." },
+    { name: "목성", icon: ICONS.jupiter, eps: 3.13, ecc: 0.0489, peri: 275, swatch: "#d8b384", blurb: "기울기가 3°에 불과해 세로로 매우 좁게 눌린 곡선." },
+    { name: "토성", icon: ICONS.saturn, eps: 26.73, ecc: 0.0565, peri: 340, swatch: "#e8d3a0", blurb: "지구와 비슷한 기울기지만 이심률이 조금 더 커 폭이 넓습니다." },
+    { name: "천왕성", icon: ICONS.uranus, eps: 97.77, ecc: 0.0472, peri: 97, swatch: "#9fd8d8", blurb: "자전축이 97.8°나 기울어 거의 누운 채 공전 — 완전히 다른 패턴." },
+    { name: "해왕성", icon: ICONS.neptune, eps: 28.32, ecc: 0.0086, peri: 276, swatch: "#5b7fe0", blurb: "이심률이 가장 작은 행성 중 하나로 대칭에 가까운 매끈한 곡선." },
   ];
 
   const el = {
@@ -573,8 +592,6 @@
     statEot: document.getElementById("stat-eot"),
     presets: document.getElementById("presets"),
     profileDetail: document.getElementById("profile-detail"),
-    chipPreset: document.getElementById("chip-preset"),
-    chipLat: document.getElementById("chip-lat"),
     chipClock: document.getElementById("chip-clock"),
     bandLabel: document.getElementById("band-label"),
   };
@@ -676,8 +693,6 @@
     el.valEcc.textContent = ecc.toFixed(3);
     el.valPeri.textContent = periDeg.toFixed(0) + "°";
     el.valLat.textContent = displayLat(latDeg);
-    el.chipLat.textContent = displayLat(latDeg);
-    el.chipPreset.textContent = currentPresetName;
     el.bandLabel.textContent = currentPresetName + " · AZ–ALT";
     updateProfileDetail(epsDeg, ecc);
 
@@ -815,7 +830,7 @@
     btn.className = "profile-tile" + (idx === 0 ? " active" : "");
     btn.dataset.name = p.name;
     btn.innerHTML = `
-      <span class="tile-icon" style="background:${p.swatch}22; border-color:${p.swatch}66; color:${p.swatch}">${p.symbol}</span>
+      <span class="tile-icon" style="background:${p.swatch}22; border-color:${p.swatch}66; color:${p.swatch}">${p.icon}</span>
       <span class="tile-name">${p.name}</span>
     `;
     btn.addEventListener("click", () => {
