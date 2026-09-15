@@ -1,5 +1,8 @@
 <meta charset="UTF-8">
 <title>아날렘마 실험실 · Analemma Lab</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {delimiters: [{left: '\\(', right: '\\)', display: false}]});"></script>
 
 <style>
   @font-face {
@@ -71,6 +74,9 @@
       radial-gradient(50% 40% at 90% 12%, rgba(240, 169, 78, 0.05), transparent 70%),
       radial-gradient(45% 35% at 6% 58%, rgba(240, 169, 78, 0.04), transparent 70%),
       radial-gradient(55% 42% at 80% 90%, rgba(240, 169, 78, 0.045), transparent 70%),
+      radial-gradient(80% 60% at 20% 30%, rgba(240, 169, 78, 0.06), transparent 60%),
+      radial-gradient(70% 50% at 80% 70%, rgba(240, 169, 78, 0.07), transparent 60%),
+      radial-gradient(100% 80% at 10% 80%, rgba(240, 169, 78, 0.05), transparent 60%),
       linear-gradient(180deg, var(--bg) 0%, var(--bg-deep) 100%);
     background-repeat: no-repeat;
     background-size: cover;
@@ -105,8 +111,9 @@
     flex-wrap: wrap;
     padding: 18px 26px;
     margin-bottom: 18px;
-    border-left: none;
-    border-right: none;
+    border-left: none !important;
+    border-right: none !important;
+    border-radius: 0 !important;
   }
 
   .brand { display: flex; align-items: center; gap: 16px; }
@@ -377,6 +384,8 @@
     padding-top: 16px;
     border-top: 1px solid var(--hair);
     text-align: center;
+    display: flex;
+    justify-content: center;
   }
   .compare-btn {
     all: unset;
@@ -385,32 +394,40 @@
     align-items: center;
     justify-content: center;
     gap: 8px;
-    padding: 10px 22px;
+    padding: 14px 28px;
     border-radius: 999px;
-    border: 1px solid var(--line-soft);
-    background: rgba(138, 151, 173, 0.08);
-    color: var(--text-dim);
-    font-size: 13.5px;
-    font-weight: 500;
+    border: 1px solid rgba(240, 169, 78, 0.4);
+    background: rgba(240, 169, 78, 0.05);
+    color: var(--amber);
+    font-size: 15px;
+    font-weight: 700;
     cursor: pointer;
-    transition: border-color 0.15s, background 0.15s, color 0.15s;
+    transition: border-color 0.15s, background 0.15s, color 0.15s, transform 0.15s, box-shadow 0.15s;
+    box-shadow: 0 4px 12px rgba(240, 169, 78, 0.15);
   }
-  .compare-btn:hover { border-color: rgba(138, 151, 173, 0.4); color: var(--text); }
-  .compare-btn:focus-visible { outline: 2px solid var(--plasma); outline-offset: 2px; }
+  .compare-btn:hover {
+    border-color: rgba(240, 169, 78, 0.7);
+    background: rgba(240, 169, 78, 0.15);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(240, 169, 78, 0.25);
+  }
+  .compare-btn:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
   .compare-btn.active {
-    border-color: rgba(95, 217, 255, 0.55);
-    background: var(--plasma-soft);
-    color: var(--text);
+    border-color: rgba(240, 169, 78, 0.8);
+    background: rgba(240, 169, 78, 0.2);
+    color: #fff;
   }
   .compare-dot {
     width: 8px; height: 8px; border-radius: 50%;
-    background: var(--text-faint);
+    background: var(--amber);
     flex: none;
     transition: background 0.15s, box-shadow 0.15s;
+    opacity: 0.6;
   }
   .compare-btn.active .compare-dot {
-    background: var(--plasma);
-    box-shadow: 0 0 8px rgba(95, 217, 255, 0.6);
+    background: #fff;
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
+    opacity: 1;
   }
 
   .legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px; font-weight: 300; color: var(--text-faint); }
@@ -438,7 +455,11 @@
   <header class="status-rail panel bracket">
     <div class="brand">
       <div class="brand-badge">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><ellipse cx="12" cy="8.3" rx="4.3" ry="4"/><ellipse cx="12" cy="15.7" rx="4.3" ry="4"/><circle cx="12" cy="4.3" r="1.1" fill="currentColor" stroke="none"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+          <circle cx="12" cy="12" r="3.5" fill="currentColor" stroke="none"/>
+          <path d="M12 5V3M12 21v-2M5 12H3M21 12h-2M7.05 7.05L5.636 5.636M18.364 18.364l-1.414-1.414M7.05 16.95l-1.414 1.414M18.364 5.636l-1.414 1.414" stroke-linecap="round"/>
+          <path d="M12 12C8 4 2 8 6 12C10 16 12 12 12 12C12 12 14 8 18 12C22 16 16 20 12 12Z" stroke-width="1.2" opacity="0.6"/>
+        </svg>
       </div>
       <div>
         <div class="brand-title">아날렘마 실험실</div>
@@ -477,7 +498,7 @@
           <svg id="chart" viewBox="0 0 720 440" preserveAspectRatio="xMidYMid meet"></svg>
         </div>
         <div class="spec-tag">
-          SPEC · KEPLER EQUATION · NEWTON–RAPHSON<br>
+          SPEC · \( M = E - e \sin E \) (KEPLER EQUATION) · NEWTON–RAPHSON<br>
           <span>균시차(EQUATION OF TIME) 기반 시태양시 고정 · 파라미터를 조정해 궤적을 바꿔보세요</span>
         </div>
       </div>
@@ -493,22 +514,22 @@
         </div>
 
         <div class="field">
-          <div class="field-label"><span>자전축 기울기</span><span class="field-value" id="val-eps">23.4°</span></div>
+          <div class="field-label"><span>자전축 기울기 \(\epsilon\)</span><span class="field-value" id="val-eps">23.4°</span></div>
           <input type="range" class="fader" id="eps" min="0" max="100" step="0.1" value="23.4">
         </div>
 
         <div class="field">
-          <div class="field-label"><span>이심률</span><span class="field-value" id="val-ecc">0.017</span></div>
+          <div class="field-label"><span>이심률 \(e\)</span><span class="field-value" id="val-ecc">0.017</span></div>
           <input type="range" class="fader" id="ecc" min="0" max="0.9" step="0.001" value="0.017">
         </div>
 
         <div class="field">
-          <div class="field-label"><span>근일점 시기</span><span class="field-value" id="val-peri">283°</span></div>
+          <div class="field-label"><span>근일점 시기 \(\varpi\)</span><span class="field-value" id="val-peri">283°</span></div>
           <input type="range" class="fader" id="peri" min="0" max="360" step="1" value="283">
         </div>
 
         <div class="field">
-          <div class="field-label"><span>관측 위도</span><span class="field-value" id="val-lat">30°N</span></div>
+          <div class="field-label"><span>관측 위도 \(\phi\)</span><span class="field-value" id="val-lat">30°N</span></div>
           <input type="range" class="fader" id="lat" min="-89" max="89" step="1" value="30">
         </div>
 
@@ -549,7 +570,7 @@
   </main>
 
   <footer class="legend-rail">
-    <span>KEPLER EQUATION · NEWTON–RAPHSON</span>
+    <span>\( M = E - e \sin E \) · NEWTON–RAPHSON</span>
     <span>AZ/ALT PROJECTION · 8 PLANETS</span>
     <a href="https://github.com/dohye0508/analemma-lab" target="_blank" rel="noopener">GITHUB ↗</a>
   </footer>
@@ -809,10 +830,13 @@
     el.profileDetail.innerHTML = `
       <div class="profile-detail-head">
         <span class="profile-detail-name">${currentPresetName}</span>
-        <span class="profile-detail-params">ε ${epsDeg.toFixed(1)}° · e ${ecc.toFixed(3)}</span>
+        <span class="profile-detail-params">\\( \\epsilon = ${epsDeg.toFixed(1)}^\\circ \\cdot e = ${ecc.toFixed(3)} \\)</span>
       </div>
       <p class="profile-detail-blurb">${preset.blurb}</p>
     `;
+    if (window.renderMathInElement) {
+      window.renderMathInElement(el.profileDetail, {delimiters: [{left: "\\(", right: "\\)", display: false}]});
+    }
   }
 
   function setActiveTile() {
