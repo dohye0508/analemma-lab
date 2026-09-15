@@ -1,28 +1,29 @@
-<title>아날렘마 실험실</title>
+<title>아날렘마 실험실 · Analemma Lab</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Noto+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
 
 <style>
   :root {
-    --bg-deep: #060912;
-    --bg: #0a0e1a;
-    --surface: #10162590;
-    --surface-solid: #10182a;
-    --surface-2: #182238;
-    --border: #263255;
-    --text: #e7ecf7;
-    --text-dim: #8b96b8;
-    --text-faint: #576088;
-    --accent-sun: #f0a94e;
-    --accent-sun-dim: #f0a94e99;
-    --accent-sun-soft: rgba(240, 169, 78, 0.12);
+    --bg-deep: #05070d;
+    --bg: #090c15;
+    --line: rgba(95, 217, 255, 0.14);
+    --line-soft: rgba(138, 151, 173, 0.16);
+    --hair: rgba(231, 237, 246, 0.07);
+    --text: #e7edf6;
+    --text-dim: #8a97ad;
+    --text-faint: #57628a;
+    --amber: #f0a94e;
+    --amber-soft: rgba(240, 169, 78, 0.13);
+    --plasma: #5fd9ff;
+    --plasma-soft: rgba(95, 217, 255, 0.13);
+    --warn: #ff5a3c;
     --ref-0: #4a90e2;
     --ref-30: #a78bfa;
     --ref-60: #57b8ad;
     --ref-89: #e0607a;
     --horizon: #6b5a3a;
-    --grid-line: #1e2842;
+    --grid-line: #1c2438;
     --star: #ffffff;
   }
 
@@ -33,6 +34,7 @@
   body {
     margin: 0;
     min-height: 100vh;
+    position: relative;
     background:
       radial-gradient(1px 1px at 8% 15%, var(--star), transparent),
       radial-gradient(1px 1px at 22% 68%, var(--star), transparent),
@@ -44,310 +46,508 @@
       radial-gradient(1px 1px at 93% 82%, var(--star), transparent),
       radial-gradient(1px 1px at 15% 92%, var(--star), transparent),
       radial-gradient(1.5px 1.5px at 58% 90%, var(--star), transparent),
-      radial-gradient(circle at 50% -10%, #16203a 0%, var(--bg) 45%, var(--bg-deep) 100%);
+      radial-gradient(120% 90% at 50% -10%, rgba(95, 217, 255, 0.05), transparent 55%),
+      radial-gradient(90% 70% at 50% 110%, rgba(240, 169, 78, 0.05), transparent 60%),
+      linear-gradient(180deg, var(--bg) 0%, var(--bg-deep) 100%);
     background-repeat: no-repeat;
     background-size: cover;
     background-attachment: fixed;
     background-color: var(--bg-deep);
     color: var(--text);
     font-family: 'Noto Sans KR', sans-serif;
-    padding: 30px 20px 50px;
   }
 
-  .wrap { max-width: 1160px; margin: 0 auto; }
+  .eng-grid {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background-image:
+      linear-gradient(var(--hair) 1px, transparent 1px),
+      linear-gradient(90deg, var(--hair) 1px, transparent 1px);
+    background-size: 44px 44px;
+    -webkit-mask-image: radial-gradient(120% 120% at 50% 30%, #000 30%, transparent 75%);
+    mask-image: radial-gradient(120% 120% at 50% 30%, #000 30%, transparent 75%);
+  }
 
-  header {
+  .wrap { position: relative; z-index: 1; max-width: 1320px; margin: 0 auto; padding: 0 20px 40px; }
+
+  /* ── Status rail ─────────────────────────────────────────────── */
+  .status-rail {
     display: flex;
-    align-items: baseline;
+    align-items: center;
+    justify-content: space-between;
     gap: 16px;
-    margin-bottom: 26px;
     flex-wrap: wrap;
+    padding: 22px 4px;
+    border-bottom: 1px solid var(--line-soft);
+    margin-bottom: 22px;
   }
 
-  h1 {
-    font-family: 'Cormorant Garamond', 'Noto Sans KR', serif;
-    font-style: italic;
-    font-weight: 600;
-    font-size: clamp(28px, 4vw, 40px);
-    margin: 0;
-    letter-spacing: 0.01em;
+  .brand { display: flex; align-items: center; gap: 12px; }
+
+  .brand-badge {
+    display: grid;
+    place-items: center;
+    width: 36px; height: 36px;
+    border-radius: 4px;
+    border: 1px solid rgba(240, 169, 78, 0.4);
+    background: var(--amber-soft);
+    color: var(--amber);
+    flex: none;
+  }
+  .brand-badge svg { width: 18px; height: 18px; }
+
+  .brand-title {
+    font-family: 'Chakra Petch', 'Noto Sans KR', sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--text);
+    line-height: 1.3;
+  }
+  .brand-sub {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9.5px;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--text-faint);
   }
 
-  .subtitle {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 11.5px;
+  .status-chips { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
+  .chip-item {
+    display: flex; align-items: baseline; gap: 6px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
     letter-spacing: 0.16em;
     text-transform: uppercase;
     color: var(--text-faint);
   }
-
-  .layout {
-    display: grid;
-    grid-template-columns: 288px 1fr;
-    gap: 18px;
-    align-items: start;
+  .chip-item b { color: var(--text); font-weight: 600; }
+  .live-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--amber);
+    box-shadow: 0 0 0 0 rgba(240, 169, 78, 0.55);
+    animation: corepulse 1.8s ease-in-out infinite;
   }
-
-  @media (max-width: 860px) {
-    .layout { grid-template-columns: 1fr; }
+  @keyframes corepulse {
+    0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(240, 169, 78, 0.5); }
+    50% { opacity: 0.55; box-shadow: 0 0 0 6px rgba(240, 169, 78, 0); }
   }
+  @media (prefers-reduced-motion: reduce) { .live-dot { animation: none; } }
 
+  /* ── Panels ──────────────────────────────────────────────────── */
   .panel {
-    background: var(--surface);
-    backdrop-filter: blur(6px);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 20px;
-    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.03) inset, 0 20px 40px -28px rgba(0, 0, 0, 0.6);
-    transition: border-color 0.2s;
+    background: linear-gradient(180deg, rgba(18, 24, 36, 0.82), rgba(8, 11, 18, 0.9));
+    border: 1px solid var(--line-soft);
+    border-radius: 10px;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03), 0 22px 44px -30px rgba(0, 0, 0, 0.75);
   }
-  .panel:hover { border-color: #32406c; }
-
-  .panel-label {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 10.5px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--text-faint);
-    margin: 0 0 12px;
-  }
-
-  .presets {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    margin-bottom: 22px;
-  }
-
-  .chip {
-    font-family: 'Noto Sans KR', sans-serif;
-    font-size: 12.5px;
-    padding: 6px 12px;
-    border-radius: 999px;
-    border: 1px solid var(--border);
-    background: var(--surface-2);
-    color: var(--text-dim);
-    cursor: pointer;
-    transition: border-color 0.15s, color 0.15s;
-  }
-  .chip:hover { border-color: var(--accent-sun-dim); color: var(--text); }
-  .chip:focus-visible { outline: 2px solid var(--accent-sun); outline-offset: 2px; }
-  .chip.active {
-    border-color: var(--accent-sun);
-    color: var(--accent-sun);
-    background: var(--accent-sun-soft);
-    box-shadow: 0 0 0 1px var(--accent-sun-soft);
-  }
-
-  .field { margin-bottom: 20px; }
-
-  .field-label {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    margin-bottom: 7px;
-    font-size: 13.5px;
-  }
-
-  .field-value {
-    font-family: 'IBM Plex Mono', monospace;
-    font-variant-numeric: tabular-nums;
-    font-size: 13px;
-    color: var(--accent-sun);
-  }
-
-  input[type="range"] {
-    -webkit-appearance: none;
-    width: 100%;
-    height: 3px;
+  .bracket { position: relative; }
+  .bracket::before, .bracket::after {
+    content: "";
+    position: absolute;
+    width: 13px; height: 13px;
+    border: 1px solid var(--amber);
+    opacity: 0.5;
+    pointer-events: none;
     border-radius: 2px;
-    background: linear-gradient(to right, var(--accent-sun) 0%, var(--accent-sun) var(--pct, 50%), var(--surface-2) var(--pct, 50%), var(--surface-2) 100%);
-    outline: none;
   }
-  input[type="range"]::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    width: 14px;
-    height: 14px;
-    border-radius: 50%;
-    background: var(--accent-sun);
-    border: 2px solid var(--bg);
-    box-shadow: 0 0 0 1px var(--border), 0 0 10px 1px var(--accent-sun-soft);
-    cursor: pointer;
-    transition: box-shadow 0.15s;
-  }
-  input[type="range"]:hover::-webkit-slider-thumb,
-  input[type="range"]:active::-webkit-slider-thumb {
-    box-shadow: 0 0 0 1px var(--border), 0 0 0 6px var(--accent-sun-soft);
-  }
-  input[type="range"]::-moz-range-thumb {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    background: var(--accent-sun);
-    border: 2px solid var(--bg);
-    cursor: pointer;
-    box-shadow: 0 0 10px 1px var(--accent-sun-soft);
-  }
-  input[type="range"]:focus-visible::-webkit-slider-thumb {
-    outline: 2px solid var(--accent-sun);
-    outline-offset: 2px;
-  }
+  .bracket::before { top: -1px; left: -1px; border-right: none; border-bottom: none; }
+  .bracket::after { bottom: -1px; right: -1px; border-left: none; border-top: none; }
 
-  .toggle-row {
+  .section-label {
     display: flex;
     align-items: center;
-    gap: 9px;
-    margin-top: 22px;
-    padding-top: 18px;
-    border-top: 1px solid var(--border);
-    font-size: 13px;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 10px;
+    padding: 0 2px;
+  }
+  .section-label .label-text {
+    display: flex; align-items: center; gap: 7px;
+    font-family: 'Chakra Petch', 'Noto Sans KR', sans-serif;
+    font-weight: 600;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
     color: var(--text-dim);
   }
-  .toggle-row input { accent-color: var(--ref-60); width: 15px; height: 15px; cursor: pointer; }
-  .toggle-row label { cursor: pointer; }
-  .swatch {
-    display: inline-block;
-    width: 9px; height: 9px;
-    border-radius: 50%;
-    margin-right: 5px;
-    vertical-align: middle;
-  }
-
-  .chart-card {
-    background: var(--surface);
-    backdrop-filter: blur(6px);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 18px 18px 8px;
-    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.03) inset, 0 24px 48px -30px rgba(0, 0, 0, 0.65);
-  }
-
-  .chart-sky {
-    border-radius: 10px;
-    background:
-      radial-gradient(120% 90% at 50% 100%, var(--accent-sun-soft) 0%, transparent 60%),
-      var(--surface-solid);
-    padding: 6px;
-  }
-
-  .chart-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    margin-bottom: 4px;
-    flex-wrap: wrap;
-    gap: 8px;
-    font-size: 12px;
+  .section-label svg { width: 13px; height: 13px; color: var(--amber); opacity: 0.85; }
+  .section-label .label-right {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9.5px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
     color: var(--text-faint);
   }
 
-  .legend { display: flex; gap: 14px; }
-
-  svg#chart { width: 100%; height: auto; display: block; }
-
-  .axis-label {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 10px;
-    fill: var(--text-faint);
+  /* ── Console grid ────────────────────────────────────────────── */
+  .console {
+    display: grid;
+    gap: 16px;
+    grid-template-columns: 1fr;
+    grid-template-areas: "profiles" "chart" "controls";
   }
-  .compass-label {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 10px;
-    fill: var(--text-dim);
+
+  .profiles-col { grid-area: profiles; min-width: 0; }
+  .viewport-col { grid-area: chart; min-width: 0; }
+  .controls-col { grid-area: controls; min-width: 0; display: flex; flex-direction: column; gap: 16px; }
+
+  /* ── Profile cards ───────────────────────────────────────────── */
+  .profile-list { display: flex; flex-direction: column; gap: 8px; }
+  .profile-card {
+    all: unset;
+    box-sizing: border-box;
+    display: block;
+    cursor: pointer;
+    padding: 11px 13px;
+    border-radius: 9px;
+    border: 1px solid var(--line-soft);
+    background: rgba(13, 18, 29, 0.55);
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .profile-card:hover { border-color: rgba(138, 151, 173, 0.32); }
+  .profile-card:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
+  .profile-card.active {
+    border-color: rgba(240, 169, 78, 0.55);
+    background: var(--amber-soft);
+    box-shadow: 0 0 0 1px rgba(240, 169, 78, 0.18);
+  }
+  .profile-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .profile-name {
+    font-family: 'Chakra Petch', 'Noto Sans KR', sans-serif;
     font-weight: 600;
+    font-size: 13.5px;
+    letter-spacing: 0.03em;
+    color: var(--text);
   }
+  .profile-swatch { width: 9px; height: 9px; border-radius: 50%; flex: none; }
+  .profile-params {
+    margin-top: 3px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9.5px;
+    letter-spacing: 0.1em;
+    color: var(--amber);
+    opacity: 0.85;
+  }
+  .profile-blurb {
+    margin: 6px 0 0;
+    font-size: 11.5px;
+    line-height: 1.45;
+    color: var(--text-dim);
+  }
+
+  @media (min-width: 700px) {
+    .console {
+      grid-template-columns: 1fr 300px;
+      grid-template-areas: "profiles profiles" "chart controls";
+    }
+    .profile-list { flex-direction: row; overflow-x: auto; padding-bottom: 4px; }
+    .profile-card { flex: 0 0 240px; }
+  }
+  @media (min-width: 1120px) {
+    .console {
+      grid-template-columns: 232px 1fr 300px;
+      grid-template-areas: "profiles chart controls";
+    }
+    .profile-list { flex-direction: column; overflow-x: visible; }
+    .profile-card { flex: none; }
+  }
+
+  /* ── Viewport (chart) ────────────────────────────────────────── */
+  .viewport-panel { position: relative; padding: 16px 16px 10px; }
+  .chart-sky {
+    position: relative;
+    border-radius: 8px;
+    background: radial-gradient(120% 90% at 50% 100%, var(--amber-soft) 0%, transparent 60%), #0a0e19;
+    padding: 6px;
+  }
+  svg#chart { width: 100%; height: auto; display: block; }
+  .axis-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; fill: var(--text-faint); }
+  .compass-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; fill: var(--text-dim); font-weight: 600; }
   .grid-line { stroke: var(--grid-line); stroke-width: 1; }
 
-  .stats-row {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: 10px;
-    margin: 14px 0 10px;
+  .spec-tag {
+    margin-top: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(231, 237, 246, 0.5);
+    line-height: 1.6;
+  }
+  .spec-tag span { color: var(--text-faint); }
+
+  /* ── Telemetry readouts ──────────────────────────────────────── */
+  .readouts { margin-top: 4px; }
+  .readout { padding: 9px 2px; border-top: 1px solid var(--hair); }
+  .readout:first-child { border-top: none; padding-top: 0; }
+  .readout-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(138, 151, 173, 0.75);
+  }
+  .readout-value {
+    margin-top: 3px;
+    font-family: 'JetBrains Mono', monospace;
+    font-variant-numeric: tabular-nums;
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--amber);
+  }
+  .readout-sub {
+    margin-top: 2px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.08em;
+    color: var(--text-faint);
   }
 
-  .stat {
-    background: var(--surface-2);
-    border-radius: 10px;
-    padding: 11px 13px;
+  /* ── Field controls ──────────────────────────────────────────── */
+  .field-panel, .telemetry-panel { padding: 16px; }
+  .field { margin-bottom: 18px; }
+  .field:last-of-type { margin-bottom: 0; }
+  .field-label {
+    display: flex; justify-content: space-between; align-items: baseline;
+    margin-bottom: 8px;
   }
-  .stat-label { font-size: 11px; color: var(--text-faint); margin-bottom: 3px; }
-  .stat-value {
-    font-family: 'IBM Plex Mono', monospace;
+  .field-label span:first-child {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+  .field-value {
+    font-family: 'JetBrains Mono', monospace;
     font-variant-numeric: tabular-nums;
-    font-size: 18px;
-    font-weight: 600;
-    color: var(--accent-sun);
+    font-size: 12.5px;
+    color: var(--amber);
   }
+
+  input[type="range"].fader {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 4px;
+    border-radius: 999px;
+    background: linear-gradient(to right, var(--amber) 0%, var(--amber) var(--pct, 50%), rgba(138, 151, 173, 0.22) var(--pct, 50%), rgba(138, 151, 173, 0.22) 100%);
+    outline: none;
+    cursor: pointer;
+  }
+  input[type="range"].fader::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px; height: 18px;
+    border-radius: 3px;
+    background: linear-gradient(180deg, #fff3dd, var(--amber));
+    border: 1px solid #2a2410;
+    box-shadow: 0 0 10px rgba(240, 169, 78, 0.5), 0 2px 4px rgba(0, 0, 0, 0.6);
+    cursor: pointer;
+  }
+  input[type="range"].fader::-moz-range-thumb {
+    width: 14px; height: 18px;
+    border-radius: 3px;
+    background: linear-gradient(180deg, #fff3dd, var(--amber));
+    border: 1px solid #2a2410;
+    box-shadow: 0 0 10px rgba(240, 169, 78, 0.5), 0 2px 4px rgba(0, 0, 0, 0.6);
+    cursor: pointer;
+  }
+  input[type="range"].fader:focus-visible { box-shadow: 0 0 0 2px var(--plasma); }
+
+  .switch-row {
+    display: flex; align-items: center; gap: 10px;
+    margin-top: 20px; padding-top: 16px;
+    border-top: 1px solid var(--hair);
+    cursor: pointer;
+  }
+  .switch { position: relative; width: 32px; height: 18px; flex: none; }
+  .switch input {
+    position: absolute; inset: 0; margin: 0; opacity: 0; cursor: pointer; z-index: 1;
+  }
+  .switch-track {
+    position: absolute; inset: 0;
+    background: rgba(138, 151, 173, 0.22);
+    border: 1px solid var(--line-soft);
+    border-radius: 999px;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .switch-track::after {
+    content: "";
+    position: absolute; top: 2px; left: 2px;
+    width: 12px; height: 12px; border-radius: 50%;
+    background: var(--text-dim);
+    transition: transform 0.15s, background 0.15s;
+  }
+  .switch input:checked + .switch-track { background: var(--plasma-soft); border-color: var(--plasma); }
+  .switch input:checked + .switch-track::after {
+    transform: translateX(14px);
+    background: var(--plasma);
+    box-shadow: 0 0 8px rgba(95, 217, 255, 0.6);
+  }
+  .switch input:focus-visible + .switch-track { outline: 2px solid var(--plasma); outline-offset: 2px; }
+  .switch-label { font-size: 12.5px; color: var(--text-dim); }
+
+  .legend { display: flex; gap: 14px; flex-wrap: wrap; font-family: 'JetBrains Mono', monospace; font-size: 10.5px; color: var(--text-faint); }
+  .swatch-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 5px; vertical-align: middle; }
+
+  /* ── Footer legend rail ──────────────────────────────────────── */
+  .legend-rail {
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+    gap: 8px 20px;
+    margin-top: 26px;
+    padding-top: 16px;
+    border-top: 1px solid var(--line-soft);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9.5px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: rgba(138, 151, 173, 0.6);
+  }
+  .legend-rail a { color: inherit; text-decoration: none; border-bottom: 1px solid var(--line-soft); }
+  .legend-rail a:hover { color: var(--text-dim); border-color: var(--text-dim); }
 </style>
 
+<div class="eng-grid" aria-hidden="true"></div>
+
 <div class="wrap">
-  <header>
-    <h1>아날렘마 실험실</h1>
-    <span class="subtitle">Analemma Lab</span>
+  <header class="status-rail">
+    <div class="brand">
+      <div class="brand-badge">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="2" fill="currentColor" stroke="none"/><ellipse cx="12" cy="12" rx="10" ry="4.2"/><ellipse cx="12" cy="12" rx="10" ry="4.2" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="10" ry="4.2" transform="rotate(120 12 12)"/></svg>
+      </div>
+      <div>
+        <div class="brand-title">아날렘마 실험실</div>
+        <div class="brand-sub">Analemma Lab · Orbital Mechanics</div>
+      </div>
+    </div>
+    <div class="status-chips">
+      <span class="chip-item"><span class="live-dot"></span>실시간 계산</span>
+      <span class="chip-item">PRESET <b id="chip-preset">지구</b></span>
+      <span class="chip-item">LAT <b id="chip-lat">30°N</b></span>
+      <span class="chip-item">LOCAL <b id="chip-clock">00:00:00</b></span>
+    </div>
   </header>
 
-  <div class="layout">
-    <div class="panel">
-      <p class="panel-label">행성 프리셋</p>
-      <div class="presets" id="presets"></div>
+  <main class="console">
+    <aside class="profiles-col">
+      <div class="section-label">
+        <span class="label-text">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 2 L21 7 L21 17 L12 22 L3 17 L3 7 Z"/></svg>
+          행성 프리셋
+        </span>
+      </div>
+      <div class="profile-list" id="presets"></div>
+    </aside>
 
-      <p class="panel-label">파라미터</p>
-
-      <div class="field">
-        <div class="field-label"><span>자전축 기울기</span><span class="field-value" id="val-eps">23.4°</span></div>
-        <input type="range" id="eps" min="0" max="90" step="0.1" value="23.4">
+    <section class="viewport-col">
+      <div class="section-label">
+        <span class="label-text">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="2" fill="currentColor" stroke="none"/><ellipse cx="12" cy="12" rx="10" ry="4.2"/><ellipse cx="12" cy="12" rx="10" ry="4.2" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="10" ry="4.2" transform="rotate(120 12 12)"/></svg>
+          관측 시야
+        </span>
+        <span class="label-right" id="band-label">지구 · AZ–ALT</span>
       </div>
 
-      <div class="field">
-        <div class="field-label"><span>이심률</span><span class="field-value" id="val-ecc">0.017</span></div>
-        <input type="range" id="ecc" min="0" max="0.9" step="0.001" value="0.017">
+      <div class="viewport-panel panel bracket">
+        <div class="chart-sky">
+          <svg id="chart" viewBox="0 0 720 440" preserveAspectRatio="xMidYMid meet"></svg>
+        </div>
+        <div class="spec-tag">
+          SPEC · KEPLER EQUATION · NEWTON–RAPHSON<br>
+          <span>균시차(EQUATION OF TIME) 기반 시태양시 고정 · 파라미터를 조정해 궤적을 바꿔보세요</span>
+        </div>
+      </div>
+    </section>
+
+    <aside class="controls-col">
+      <div class="field-panel panel bracket">
+        <div class="section-label">
+          <span class="label-text">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2 12c2-3 4-3 6 0s4 3 6 0 4-3 6 0"/></svg>
+            파라미터 조정
+          </span>
+        </div>
+
+        <div class="field">
+          <div class="field-label"><span>자전축 기울기</span><span class="field-value" id="val-eps">23.4°</span></div>
+          <input type="range" class="fader" id="eps" min="0" max="100" step="0.1" value="23.4">
+        </div>
+
+        <div class="field">
+          <div class="field-label"><span>이심률</span><span class="field-value" id="val-ecc">0.017</span></div>
+          <input type="range" class="fader" id="ecc" min="0" max="0.9" step="0.001" value="0.017">
+        </div>
+
+        <div class="field">
+          <div class="field-label"><span>근일점 시기</span><span class="field-value" id="val-peri">283°</span></div>
+          <input type="range" class="fader" id="peri" min="0" max="360" step="1" value="283">
+        </div>
+
+        <div class="field">
+          <div class="field-label"><span>관측 위도</span><span class="field-value" id="val-lat">30°N</span></div>
+          <input type="range" class="fader" id="lat" min="-89" max="89" step="1" value="30">
+        </div>
+
+        <label class="switch-row">
+          <span class="switch">
+            <input type="checkbox" id="compareToggle">
+            <span class="switch-track"></span>
+          </span>
+          <span class="switch-label">0°/30°/60°/90°N과 겹쳐보기</span>
+        </label>
       </div>
 
-      <div class="field">
-        <div class="field-label"><span>근일점 시기</span><span class="field-value" id="val-peri">283°</span></div>
-        <input type="range" id="peri" min="0" max="360" step="1" value="283">
+      <div class="telemetry-panel panel bracket">
+        <div class="section-label">
+          <span class="label-text">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2 12h4l2-7 4 14 3-9 2 4h5"/></svg>
+            관측 통계
+          </span>
+        </div>
+        <div class="readouts">
+          <div class="readout">
+            <div class="readout-label">세로 폭 (고도)</div>
+            <div class="readout-value" id="stat-alt">–</div>
+            <div class="readout-sub">고도 변화 범위</div>
+          </div>
+          <div class="readout">
+            <div class="readout-label">가로 폭 (방위각)</div>
+            <div class="readout-value" id="stat-az">–</div>
+            <div class="readout-sub">방위각 변화 범위</div>
+          </div>
+          <div class="readout">
+            <div class="readout-label">균시차 범위</div>
+            <div class="readout-value" id="stat-eot">–</div>
+            <div class="readout-sub">시태양시 − 평균태양시</div>
+          </div>
+        </div>
+        <div class="legend" id="legend" style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--hair);"></div>
       </div>
+    </aside>
+  </main>
 
-      <div class="field">
-        <div class="field-label"><span>관측 위도</span><span class="field-value" id="val-lat">30°N</span></div>
-        <input type="range" id="lat" min="-89" max="89" step="1" value="30">
-      </div>
-
-      <div class="toggle-row">
-        <input type="checkbox" id="compareToggle">
-        <label for="compareToggle">0°/30°/60°/90°N과 겹쳐보기</label>
-      </div>
-    </div>
-
-    <div class="chart-card">
-      <div class="chart-top">
-        <span>Az–Alt</span>
-        <div class="legend" id="legend"></div>
-      </div>
-      <div class="chart-sky">
-        <svg id="chart" viewBox="0 0 720 440" preserveAspectRatio="xMidYMid meet"></svg>
-      </div>
-
-      <div class="stats-row">
-        <div class="stat"><div class="stat-label">세로 폭</div><div class="stat-value" id="stat-alt">–</div></div>
-        <div class="stat"><div class="stat-label">가로 폭</div><div class="stat-value" id="stat-az">–</div></div>
-        <div class="stat"><div class="stat-label">균시차 범위</div><div class="stat-value" id="stat-eot">–</div></div>
-      </div>
-    </div>
-  </div>
+  <footer class="legend-rail">
+    <span>KEPLER EQUATION · NEWTON–RAPHSON</span>
+    <span>AZ/ALT PROJECTION · 8 PLANETS</span>
+    <a href="https://github.com/dohye0508/analemma-lab" target="_blank" rel="noopener">GITHUB ↗</a>
+  </footer>
 </div>
 
 <script>
 (function () {
   const PRESETS = [
-    { name: "지구", eps: 23.44, ecc: 0.0167, peri: 283 },
-    { name: "수성", eps: 0.03, ecc: 0.206, peri: 30 },
-    { name: "금성", eps: 2.64, ecc: 0.0068, peri: 55 },
-    { name: "화성", eps: 25.19, ecc: 0.0934, peri: 286 },
-    { name: "목성", eps: 3.13, ecc: 0.0489, peri: 275 },
-    { name: "토성", eps: 26.73, ecc: 0.0565, peri: 340 },
-    { name: "천왕성", eps: 97.77, ecc: 0.0472, peri: 97 },
-    { name: "해왕성", eps: 28.32, ecc: 0.0086, peri: 276 },
+    { name: "지구", eps: 23.44, ecc: 0.0167, peri: 283, swatch: "#4a90e2", blurb: "표준적인 8자형 아날렘마 — 자전축 기울기와 낮은 이심률이 균형을 이룹니다." },
+    { name: "수성", eps: 0.03, ecc: 0.206, peri: 30, swatch: "#b8b0a4", blurb: "태양계 최대 이심률(0.206). 기울기가 거의 없어 눈물방울에 가까운 궤적." },
+    { name: "금성", eps: 2.64, ecc: 0.0068, peri: 55, swatch: "#e8cf9c", blurb: "기울기·이심률 모두 0에 가까워 폭이 거의 없는 실낱같은 궤적." },
+    { name: "화성", eps: 25.19, ecc: 0.0934, peri: 286, swatch: "#c1552c", blurb: "지구보다 큰 기울기와 이심률이 겹쳐 뚜렷하게 비대칭인 8자형." },
+    { name: "목성", eps: 3.13, ecc: 0.0489, peri: 275, swatch: "#d8b384", blurb: "기울기가 3°에 불과해 세로로 매우 좁게 눌린 곡선." },
+    { name: "토성", eps: 26.73, ecc: 0.0565, peri: 340, swatch: "#e8d3a0", blurb: "지구와 비슷한 기울기지만 이심률이 조금 더 커 폭이 넓습니다." },
+    { name: "천왕성", eps: 97.77, ecc: 0.0472, peri: 97, swatch: "#9fd8d8", blurb: "자전축이 97.8°나 기울어 거의 누운 채 공전 — 완전히 다른 패턴." },
+    { name: "해왕성", eps: 28.32, ecc: 0.0086, peri: 276, swatch: "#5b7fe0", blurb: "이심률이 가장 작은 행성 중 하나로 대칭에 가까운 매끈한 곡선." },
   ];
 
   const el = {
@@ -366,6 +566,10 @@
     statAz: document.getElementById("stat-az"),
     statEot: document.getElementById("stat-eot"),
     presets: document.getElementById("presets"),
+    chipPreset: document.getElementById("chip-preset"),
+    chipLat: document.getElementById("chip-lat"),
+    chipClock: document.getElementById("chip-clock"),
+    bandLabel: document.getElementById("band-label"),
   };
 
   function keplerE(M, e) {
@@ -448,13 +652,15 @@
     { deg: 360, label: "N" },
   ];
 
+  let currentPresetName = PRESETS[0].name;
+
   function render() {
     const epsDeg = parseFloat(el.eps.value);
     const ecc = parseFloat(el.ecc.value);
     const periDeg = parseFloat(el.peri.value);
     const latDeg = parseFloat(el.lat.value);
 
-    el.eps.style.setProperty("--pct", ((epsDeg - 0) / 90) * 100 + "%");
+    el.eps.style.setProperty("--pct", ((epsDeg - 0) / 100) * 100 + "%");
     el.ecc.style.setProperty("--pct", ((ecc - 0) / 0.9) * 100 + "%");
     el.peri.style.setProperty("--pct", ((periDeg - 0) / 360) * 100 + "%");
     el.lat.style.setProperty("--pct", ((latDeg + 89) / 178) * 100 + "%");
@@ -463,6 +669,9 @@
     el.valEcc.textContent = ecc.toFixed(3);
     el.valPeri.textContent = periDeg.toFixed(0) + "°";
     el.valLat.textContent = displayLat(latDeg);
+    el.chipLat.textContent = displayLat(latDeg);
+    el.chipPreset.textContent = currentPresetName;
+    el.bandLabel.textContent = currentPresetName + " · AZ–ALT";
 
     const main = computeCurve(epsDeg, ecc, periDeg, latDeg);
     const mainAzU = unwrap(main.az);
@@ -495,7 +704,7 @@
     const xScale = (v) => marginL + ((v - azLo) / (azHi - azLo)) * plotW;
     const yScale = (v) => marginT + plotH - ((v - altLo) / (altHi - altLo)) * plotH;
 
-    const accentSun = css("--accent-sun");
+    const accentSun = css("--amber");
     const gridLine = css("--grid-line");
     const textDim = css("--text-dim");
     const bg = css("--bg");
@@ -540,10 +749,10 @@
     el.chart.setAttribute("viewBox", `0 0 ${W} ${H}`);
     el.chart.innerHTML = svg;
 
-    let legendHtml = `<span><span class="swatch" style="background:${accentSun}"></span>${el.valLat.textContent}</span>`;
+    let legendHtml = `<span><span class="swatch-dot" style="background:${accentSun}"></span>${el.valLat.textContent}</span>`;
     if (compareOn) {
       refs.forEach((r) => {
-        legendHtml += `<span><span class="swatch" style="background:${r.color}"></span>${displayLat(r.lat)}</span>`;
+        legendHtml += `<span><span class="swatch-dot" style="background:${r.color}"></span>${displayLat(r.lat)}</span>`;
       });
     }
     el.legend.innerHTML = legendHtml;
@@ -569,18 +778,27 @@
   }
 
   [el.eps, el.ecc, el.peri, el.lat].forEach((input) => input.addEventListener("input", () => {
-    document.querySelectorAll(".chip.active").forEach((c) => c.classList.remove("active"));
+    document.querySelectorAll(".profile-card.active").forEach((c) => c.classList.remove("active"));
+    currentPresetName = "사용자 정의";
     render();
   }));
   el.compareToggle.addEventListener("change", render);
 
   PRESETS.forEach((p, idx) => {
     const btn = document.createElement("button");
-    btn.className = "chip" + (idx === 0 ? " active" : "");
-    btn.textContent = p.name;
+    btn.className = "profile-card" + (idx === 0 ? " active" : "");
+    btn.innerHTML = `
+      <div class="profile-top">
+        <span class="profile-name">${p.name}</span>
+        <span class="profile-swatch" style="background:${p.swatch}; box-shadow: 0 0 6px ${p.swatch}"></span>
+      </div>
+      <div class="profile-params">ε ${p.eps.toFixed(1)}° · e ${p.ecc.toFixed(3)}</div>
+      <p class="profile-blurb">${p.blurb}</p>
+    `;
     btn.addEventListener("click", () => {
-      document.querySelectorAll(".chip.active").forEach((c) => c.classList.remove("active"));
+      document.querySelectorAll(".profile-card.active").forEach((c) => c.classList.remove("active"));
       btn.classList.add("active");
+      currentPresetName = p.name;
       el.eps.value = p.eps;
       el.ecc.value = p.ecc;
       el.peri.value = p.peri;
@@ -588,6 +806,12 @@
     });
     el.presets.appendChild(btn);
   });
+
+  function tickClock() {
+    el.chipClock.textContent = new Date().toLocaleTimeString('ko-KR', { hour12: false });
+  }
+  tickClock();
+  setInterval(tickClock, 1000);
 
   render();
 })();
