@@ -513,7 +513,7 @@
 
         <div class="field">
           <div class="field-label"><span>자전축 기울기 \(\epsilon\)</span><span class="field-value" id="val-eps">23.4°</span></div>
-          <input type="range" class="fader" id="eps" min="0" max="100" step="0.1" value="23.4">
+          <input type="range" class="fader" id="eps" min="0" max="180" step="0.1" value="23.4">
         </div>
 
         <div class="field">
@@ -588,14 +588,14 @@
   };
 
   const PRESETS = [
-    { name: "지구", icon: ICONS.earth, eps: 23.44, ecc: 0.0167, peri: 283, swatch: "#4a90e2", blurb: "표준적인 8자형 아날렘마 — 자전축 기울기와 낮은 이심률이 균형을 이룹니다." },
-    { name: "수성", icon: ICONS.mercury, eps: 0.03, ecc: 0.206, peri: 30, swatch: "#b8b0a4", blurb: "태양계 최대 이심률(0.206). 기울기가 거의 없어 눈물방울에 가까운 궤적." },
-    { name: "금성", icon: ICONS.venus, eps: 2.64, ecc: 0.0068, peri: 55, swatch: "#e8cf9c", blurb: "기울기·이심률 모두 0에 가까워 폭이 거의 없는 실낱같은 궤적." },
-    { name: "화성", icon: ICONS.mars, eps: 25.19, ecc: 0.0934, peri: 286, swatch: "#c1552c", blurb: "지구보다 큰 기울기와 이심률이 겹쳐 뚜렷하게 비대칭인 8자형." },
-    { name: "목성", icon: ICONS.jupiter, eps: 3.13, ecc: 0.0489, peri: 275, swatch: "#d8b384", blurb: "기울기가 3°에 불과해 세로로 매우 좁게 눌린 곡선." },
-    { name: "토성", icon: ICONS.saturn, eps: 26.73, ecc: 0.0565, peri: 340, swatch: "#e8d3a0", blurb: "지구와 비슷한 기울기지만 이심률이 조금 더 커 폭이 넓습니다." },
-    { name: "천왕성", icon: ICONS.uranus, eps: 97.77, ecc: 0.0472, peri: 97, swatch: "#9fd8d8", blurb: "자전축이 97.8°나 기울어 거의 누운 채 공전 — 완전히 다른 패턴." },
-    { name: "해왕성", icon: ICONS.neptune, eps: 28.32, ecc: 0.0086, peri: 276, swatch: "#5b7fe0", blurb: "이심률이 가장 작은 행성 중 하나로 대칭에 가까운 매끈한 곡선." },
+    { name: "지구", icon: ICONS.earth, eps: 23.44, ecc: 0.0167, peri: 283, swatch: "#4a90e2", blurb: "경사 효과(반년 주기)와 타원 효과(1년 주기)가 비슷한 크기라 두 고리의 크기가 다른 비대칭 8자형." },
+    { name: "수성", icon: ICONS.mercury, eps: 0.03, ecc: 0.2056, peri: 49, swatch: "#b8b0a4", blurb: "자전축이 거의 서 있어 적위가 변하지 않고, 이심률(0.206)이 커서 가로로만 길게 늘어진 선. 자전:공전이 3:2라 하루(176일)가 1년의 2배입니다." },
+    { name: "금성", icon: ICONS.venus, eps: 177.36, ecc: 0.0068, peri: 74, swatch: "#e8cf9c", blurb: "거꾸로 자전해 기울기는 177.4°(실제로는 2.6°만 기운 셈)이고 이심률도 작아 아주 작은 고리." },
+    { name: "화성", icon: ICONS.mars, eps: 25.19, ecc: 0.0934, peri: 251, swatch: "#c1552c", blurb: "기울기는 지구와 비슷하지만 이심률이 5배 이상이라 타원 효과가 경사 효과의 약 3.7배 → 작은 고리가 사라진 눈물방울." },
+    { name: "목성", icon: ICONS.jupiter, eps: 3.13, ecc: 0.0484, peri: 58, swatch: "#d8b384", blurb: "기울기가 3°뿐이라 경사 효과가 거의 없고, 1년 주기 진동끼리 만나 납작한 타원이 됩니다." },
+    { name: "토성", icon: ICONS.saturn, eps: 26.73, ecc: 0.0539, peri: 279, swatch: "#e8d3a0", blurb: "타원 효과가 경사 효과의 약 2배라 한쪽 고리가 거의 사라진 눈물방울." },
+    { name: "천왕성", icon: ICONS.uranus, eps: 97.77, ecc: 0.0473, peri: 3, swatch: "#9fd8d8", blurb: "자전축이 97.8° 누워 태양 적위가 ±82°까지 변하고, 경사 효과가 매우 커서 거대한 대칭 8자가 됩니다." },
+    { name: "해왕성", icon: ICONS.neptune, eps: 28.32, ecc: 0.0086, peri: 359, swatch: "#5b7fe0", blurb: "이심률이 매우 작아 경사 효과만 남은, 좌우 대칭에 가까운 8자." },
   ];
 
   const el = {
@@ -644,7 +644,9 @@
       const sinDelta = Math.sin(eps) * Math.sin(lambda);
       const delta = Math.asin(Math.max(-1, Math.min(1, sinDelta)));
       const alpha = Math.atan2(Math.cos(eps) * Math.sin(lambda), Math.cos(lambda));
-      const meanLon = M + peri;
+      // tilt > 90 deg (Venus, Uranus): the Sun's right ascension runs backwards on average,
+      // so the mean sun has to run backwards too
+      const meanLon = (Math.cos(eps) >= 0 ? 1 : -1) * (M + peri);
       let eot = meanLon - alpha;
       eot = Math.atan2(Math.sin(eot), Math.cos(eot));
       const H = eot;
@@ -708,7 +710,7 @@
     const periDeg = parseFloat(el.peri.value);
     const latDeg = parseFloat(el.lat.value);
 
-    el.eps.style.setProperty("--pct", ((epsDeg - 0) / 100) * 100 + "%");
+    el.eps.style.setProperty("--pct", ((epsDeg - 0) / 180) * 100 + "%");
     el.ecc.style.setProperty("--pct", ((ecc - 0) / 0.9) * 100 + "%");
     el.peri.style.setProperty("--pct", ((periDeg - 0) / 360) * 100 + "%");
     el.lat.style.setProperty("--pct", ((latDeg + 89) / 178) * 100 + "%");
@@ -815,7 +817,7 @@
       const nu = 2 * Math.atan2(Math.sqrt(1 + ecc) * Math.sin(E / 2), Math.sqrt(1 - ecc) * Math.cos(E / 2));
       const lambda = nu + peri;
       const alpha = Math.atan2(Math.cos(eps) * Math.sin(lambda), Math.cos(lambda));
-      const meanLon = M + peri;
+      const meanLon = (Math.cos(eps) >= 0 ? 1 : -1) * (M + peri);
       let eot = meanLon - alpha;
       eot = Math.atan2(Math.sin(eot), Math.cos(eot));
       H_deg.push((eot * 180) / Math.PI);
