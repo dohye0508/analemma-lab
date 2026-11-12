@@ -18,19 +18,59 @@ latitude-comparison overlay.
    right ascension, giving the hour angle H.
 5. Horizontal coordinates: `sin(alt) = sin(φ)sin(δ) + cos(φ)cos(δ)cos(H)`.
 
-No build step — open `index.html` directly.
+No build step, package installation, or network connection is needed — open
+`index.html` directly. All fonts and runtime code are included locally.
+
+## Simulation workspace
+
+- **관측 / Sky:** a perspective sky view with camera movement, a horizon,
+  altitude/azimuth grid, annual solar trail, and current Sun marker. Below-horizon
+  trajectories use dashed lines.
+- **궤도 / Orbit:** the corresponding Kepler orbit, current orbital position,
+  perihelion/aphelion, and inertially fixed tilted rotation axis. Distance is in
+  units of the semimajor axis `a`; body sizes are exaggerated for visibility.
+- **그래프 / Graph:** the original azimuth–altitude analysis with pan/zoom and
+  overlays at 0°, 30°, 60°, and 89°N. Statistics always refer to the selected
+  observer, even when comparison curves are visible.
+- The inspector retains the eight presets, obliquity (0–180°), eccentricity
+  (0–0.9), perihelion direction (0–360°), and observer latitude (−89–89°).
+  Numeric inputs retain the full preset precision. Changed presets are marked
+  and can be restored without changing the observer latitude.
+- Playback and scrubbing use a normalized orbital period. 0% is perihelion,
+  50% is aphelion; this is not a calendar date or continuous diurnal motion.
+  Each frame samples the Sun at local **mean** solar noon.
+
+Drag the viewport to move the camera; scroll to zoom. `Space` toggles playback,
+`R` fits the view, `G` toggles the grid, `T` toggles the trail, `1`/`2`/`3` select
+views, `F` toggles fullscreen, and `?` opens help. Focus the canvas to use arrow
+keys for camera movement. Editing form fields does not trigger these shortcuts.
+On narrow screens the inspector opens with the panel button.
+
+The model retains the original geometric assumptions and retrograde mean-Sun
+handling. It does not model atmospheric refraction, real terrain, or spin–orbit
+resonance. The equation of time is displayed in angular degrees for consistent
+comparison between planets. Geographic poles are capped at ±89° to avoid the
+azimuth singularity and are labeled with their actual computed latitude.
+
+Run the dependency-free physics checks with Node.js:
+
+```sh
+node --test tests/physics.test.cjs
+```
 
 ## Project layout
 
 ```
-index.html              the web app (deployed via GitHub Pages)
+index.html              simulator shell (deployed via GitHub Pages)
 src/
+  simulator/            physics, canvas rendering, UI controls, and styles
   stellarium/            Stellarium script-console (F1) sources
   analysis/              Python: raw .txt -> CSV + comparison plots
   report/                docx report generator
 data/
   single_latitude/       per-planet CSV + plot at a fixed 30N latitude
   by_latitude/           per-planet CSV + plot across 0/30/60/89.9N
+tests/                  physics regression and boundary checks
 ```
 
 ## Reproducing the data
