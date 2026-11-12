@@ -46,8 +46,6 @@
     <main class="workspace">
       <section class="viewport" id="viewport" aria-label="시뮬레이션">
         <canvas id="scene" tabindex="0" aria-label="태양 관측. 드래그와 화살표로 이동, 휠·핀치·더하기·빼기로 확대 및 축소."></canvas>
-        <div class="view-marker"><svg class="icon" aria-hidden="true"><use id="sessionIcon" href="#i-sky"/></svg><span id="viewName">지표 관측</span><span id="viewLocation">지구 / 30°N</span></div>
-        <a class="photo-credit" id="photoCredit" href="https://www.eso.org/public/images/uhd_img2563pv2_cc_eq/" target="_blank" rel="noopener">ESO/B. Tafreshi · CC BY 4.0</a>
         <nav class="planet-picker" id="presets" aria-label="행성 선택"></nav>
         <button class="context-view" id="contextSwap" aria-label="궤도 크게 보기" title="궤도 크게 보기">
           <canvas id="contextScene" aria-hidden="true"></canvas><span class="context-label" id="contextLabel">공전 궤도</span><span class="swap-mark"><svg class="icon" aria-hidden="true"><use href="#i-swap"/></svg></span>
@@ -86,11 +84,7 @@
           <button id="gridToggle" class="icon-button" aria-label="격자 (G)" title="격자 (G)" aria-pressed="false"><svg class="icon" aria-hidden="true"><use href="#i-grid"/></svg><span class="tool-label">격자</span></button>
           <button id="trailToggle" class="icon-button" aria-label="궤적 (T)" title="궤적 (T)" aria-pressed="true"><svg class="icon" aria-hidden="true"><use href="#i-trail"/></svg><span class="tool-label">궤적</span></button>
         </div>
-        <div class="tool-group">
-          <button id="zoomOut" class="icon-button" aria-label="축소 (−)" title="축소 (−)" ><svg class="icon" aria-hidden="true"><use href="#i-minus"/></svg><span class="tool-label">축소</span></button>
-          <button id="zoomIn" class="icon-button" aria-label="확대 (+)" title="확대 (+)" ><svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg><span class="tool-label">확대</span></button>
-          <button id="fit" class="icon-button" aria-label="시점 맞춤 (R)" title="시점 맞춤 (R)" ><svg class="icon" aria-hidden="true"><use href="#i-fit"/></svg><span class="tool-label">시점 맞춤</span></button>
-        </div>
+        
         <div class="tool-group">
           <button id="reset" class="icon-button" aria-label="시뮬레이션 초기화" title="시뮬레이션 초기화" ><svg class="icon" aria-hidden="true"><use href="#i-reset"/></svg><span class="tool-label">초기화</span></button>
           <button id="fullscreen" class="icon-button" aria-label="전체 화면 (F)" title="전체 화면 (F)" aria-pressed="false"><svg class="icon" aria-hidden="true"><use href="#i-expand"/></svg><span class="tool-label">전체 화면</span></button>
@@ -98,6 +92,11 @@
           <button id="panelToggle" class="icon-button" aria-label="속성 패널 숨기기" title="속성 패널 숨기기" aria-expanded="true" aria-controls="inspector"><svg class="icon" aria-hidden="true"><use href="#i-settings"/></svg><span class="tool-label">속성</span></button>
         </div>
       </nav>
+<nav class="camera-tools" aria-label="카메라 조작">
+          <button id="zoomOut" class="icon-button" aria-label="축소 (−)" title="축소 (−)" ><svg class="icon" aria-hidden="true"><use href="#i-minus"/></svg></button>
+          <button id="zoomIn" class="icon-button" aria-label="확대 (+)" title="확대 (+)" ><svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg></button>
+          <button id="fit" class="icon-button" aria-label="시점 맞춤 (R)" title="시점 맞춤 (R)" ><svg class="icon" aria-hidden="true"><use href="#i-fit"/></svg></button>
+        </nav>
     </footer>
   </div>
   <dialog id="helpDialog" aria-labelledby="helpTitle">
@@ -106,7 +105,7 @@
       <p>같은 장소, 같은 평균태양시 정오의 태양을 한 공전 동안 관측합니다.</p>
       <dl class="shortcut-list"><div><dt>드래그 · 화살표</dt><dd>시점 이동</dd></div><div><dt>휠 · 핀치 · + / −</dt><dd>확대·축소</dd></div><div><dt>Space</dt><dd>재생·정지</dd></div><div><dt>공전 % 클릭</dt><dd>위치 이동·직접 입력</dd></div><div><dt>R</dt><dd>시점 맞춤</dd></div><div><dt>1 / 2 / 3</dt><dd>관측 / 궤도 / 그래프 펼치기</dd></div><div><dt>G / T / F</dt><dd>격자 / 궤적 / 전체 화면</dd></div></dl>
       <details><summary>선택한 행성</summary><p id="planetDescription"></p></details>
-      <details><summary>은하수 배경</summary><p>ESO에서 촬영한 파노라마를 관측 장면으로 사용합니다. 별과 지형은 배경 사진이며 현재 위도나 시간의 실제 별자리 계산은 아닙니다. 태양 궤적은 기존 평균태양시 정오 모델을 그대로 사용합니다.</p><p id="photoDetails"></p><p>지구 표면: <a href="https://www.solarsystemscope.com/textures/" target="_blank" rel="noopener">Solar System Scope</a> · CC BY 4.0</p></details>
+      <details><summary>배경·사진 출처</summary><p>ESO에서 촬영한 파노라마를 관측 장면으로 사용합니다. 별과 지형은 배경 사진이며 현재 위도나 시간의 실제 별자리 계산은 아닙니다. 태양 궤적은 기존 평균태양시 정오 모델을 그대로 사용합니다.</p><p id="photoDetails"></p><a class="photo-source" id="photoCredit" href="https://www.eso.org/public/images/uhd_img2563pv2_cc_eq/" target="_blank" rel="noopener">ESO/B. Tafreshi · CC BY 4.0</a><p>지구 표면: <a href="https://www.solarsystemscope.com/textures/" target="_blank" rel="noopener">Solar System Scope</a> · CC BY 4.0</p></details>
       <details><summary>계산과 단위</summary><p>공전 0%는 근일점, 50%는 원일점입니다. 실제 달력 날짜나 하루 동안의 운동을 뜻하지 않습니다. 재생 속도 1×에서 한 공전은 20초입니다.</p><p>케플러 방정식 M = E − e sin E로 태양의 적위·균시차·방위각·고도를 계산합니다. 균시차 단위는 각도(°), 근일점 방향은 기존 모델의 태양 황경 기준입니다. 위도는 극점의 방위각 특이점을 피해 ±89°까지 계산합니다.</p><p>궤도 거리의 기준은 긴반지름 a이며 천체 크기는 확대했습니다. 대기 굴절, 실제 지형, 자전·공전 공명은 포함하지 않습니다. 지평선 아래 궤적은 점선입니다.</p></details>
       <a href="https://github.com/dohye0508/analemma-lab" target="_blank" rel="noopener noreferrer">소스 코드 ↗</a>
     </div>

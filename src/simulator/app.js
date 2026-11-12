@@ -76,7 +76,6 @@
       if (except !== def.id + 'Number') $(def.id + 'Number').value = state.params[def.id];
       $(def.id).setAttribute('aria-valuetext', def.id === 'lat' ? P.latitudeLabel(state.params.lat) : state.params[def.id] + def.unit);
     }
-    $('viewLocation').textContent = state.preset.name + ' / ' + P.latitudeLabel(state.params.lat);
     $('latNumber').title = P.latitudeLabel(state.params.lat) + ' · 음수는 남위';
     $('modified').hidden = ['eps', 'ecc', 'peri'].every(id => Math.abs(state.params[id] - state.preset[id]) < 1e-9);
   }
@@ -126,7 +125,6 @@
   }
   function setView(view) {
     state.view = view;
-    $('sessionIcon').setAttribute('href', view === 'sky' ? '#i-sky' : '#i-orbit');
     $('viewport').dataset.view = view;
     const label = view === 'sky' ? '궤도 크게 보기' : '관측 크게 보기';
     $('cameraToggle').setAttribute('aria-pressed', String(view === 'orbit'));
@@ -136,7 +134,6 @@
     $('contextSwap').setAttribute('aria-label', label);
     $('contextSwap').title = label;
     $('cameraToggle').querySelector('.tool-label').textContent = view === 'sky' ? '궤도' : '관측';
-    $('viewName').textContent = view === 'sky' ? '지표 관측' : '공전 궤도';
     $('contextLabel').textContent = view === 'sky' ? '공전 궤도' : '지표 관측';
     window.NightEnvironment.updateCredit(view);
     invalidate();

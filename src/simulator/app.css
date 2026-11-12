@@ -388,11 +388,11 @@ dialog::backdrop { background:#080c12a8; }
 
 /* Stable internal spacing; extra rail height belongs to the graph. */
 @media(min-width:851px) {
-  :root:has(.analysis-panel:not([hidden])) .inspector { height:546px; max-height:calc(100% - 210px); }
+  :root:has(.analysis-panel:not([hidden])) .inspector { height:618px; max-height:calc(100% - 210px); }
   .inspector-scroll { display:flex; flex-direction:column; justify-content:flex-start; padding-bottom:12px; }
   .planet-picker { row-gap:8px; padding-top:8px; padding-bottom:14px; }
   .properties { flex:0 0 auto; min-height:0; display:block; padding:6px 0; }
-  .property { padding:7px 0; }
+  .property { padding:16px 0; }
   .live-readings { padding:12px 0; }
   .annual-stats { margin-top:0; }
   .analysis-panel:not(.expanded) { height:calc(100% - var(--inspector-bottom)); max-height:none; }
@@ -407,3 +407,23 @@ dialog::backdrop { background:#080c12a8; }
   .tool-dock { left:50%; transform:translateX(-50%); padding:6px; }
   .tool-group { gap:2px; }
 }
+
+/* Secondary camera controls stay separate from the main simulation actions. */
+.photo-source { display:inline-block; margin:4px 0 12px; color:#bad6e5; font-size:13px; }
+.camera-tools { position:absolute; right:12px; bottom:170px; display:flex; flex-direction:column; gap:3px; padding:4px; background:#0b1116db; border:1px solid #bdcdd629; pointer-events:auto; }
+.camera-tools .icon-button { width:36px; height:36px; border-radius:0; }
+.camera-tools .icon { width:24px; height:24px; }
+@media(min-width:851px) {
+  :root { --scene-top:90px; }
+  .tool-dock { display:flex; }
+  .tool-group { display:flex; }
+}
+@media(max-width:850px) {
+  .camera-tools { bottom:140px; }
+}
+@media(max-width:700px) {
+  .tool-dock { grid-template-columns:repeat(5,minmax(0,1fr)); }
+  .camera-tools { bottom:166px; right:8px; }
+  .property { padding:12px 0; }
+}
+@media(max-height:500px) { .camera-tools { bottom:58px; } }

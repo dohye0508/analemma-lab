@@ -39,10 +39,11 @@ where browser texture security prevents spherical rendering.
   It supports independent pan/zoom, expansion, and overlays at 0°, 30°, 60°,
   and 89°N. Opening it preserves the main camera and playback state.
 - The selected C layout docks a compact inspector and graph in a single left
-  column. The continuous top toolbar uses 36px icons with short Korean labels.
+  column. The centered top toolbar uses nine primary icons with short Korean labels.
+  Zoom and camera fit use a separate compact icon strip on the right.
   Panels end where their content ends, exposing the photographic scene. Property
   names (15px) and editable values (16px) share a row; each property occupies
-  50px including its slider. The bottom playback control is 48px high.
+  75px including its slider. The bottom playback control is 48px high.
 - Click the orbital percentage to open a compact seek panel: drag the slider,
   type a percentage, or use 0/25/50/75/100% checkpoints. Enter applies and closes;
   Escape closes and returns focus. Playback and the eight presets remain wired
@@ -112,8 +113,7 @@ icons, a compact playback control, and the main simulation in one workspace.
 ESO/B. Tafreshi's Atacama panorama is projected around the sky camera with WebGL.
 ESO/S. Brunier's Milky Way panorama supplies the orbital background; the Earth
 surface uses Solar System Scope's texture. Full links, CC BY 4.0 credits, and
-adaptations are listed in `assets/CREDITS.txt` and in the on-screen photo credit
-and help. These are illustrative photographs, not a current-location star map;
+adaptations are listed in `assets/CREDITS.txt` and in help. These are illustrative photographs, not a current-location star map;
 the original mean-solar-noon model remains unchanged. Failed image/WebGL loading
 falls back to a flat photograph or the original scene background.
 
