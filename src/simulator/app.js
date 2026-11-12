@@ -28,10 +28,11 @@
     button.dataset.planet = preset.id;
     button.title = preset.name;
     button.setAttribute('aria-label', preset.name + ' 프리셋');
-    button.innerHTML = '<span class="planet ' + preset.id + '" aria-hidden="true"></span>';
+    button.innerHTML = '<span class="planet ' + preset.id + '" aria-hidden="true"></span><span class="planet-label">' + preset.name + '</span>';
     button.addEventListener('click', () => selectPlanet(preset));
     $('presets').append(button);
   }
+  document.querySelector('.inspector-scroll').prepend($('presets'));
   const renderer = new window.AnalemmaRenderer($('scene'));
   const contextRenderer = new window.AnalemmaRenderer($('contextScene'), { compact: true });
   const graphRenderer = new window.AnalemmaRenderer($('plotScene'), { plot: true });
@@ -75,6 +76,7 @@
       if (except !== def.id + 'Number') $(def.id + 'Number').value = state.params[def.id];
       $(def.id).setAttribute('aria-valuetext', def.id === 'lat' ? P.latitudeLabel(state.params.lat) : state.params[def.id] + def.unit);
     }
+    $('viewLocation').textContent = state.preset.name + ' / ' + P.latitudeLabel(state.params.lat);
     $('latNumber').title = P.latitudeLabel(state.params.lat) + ' · 음수는 남위';
     $('modified').hidden = ['eps', 'ecc', 'peri'].every(id => Math.abs(state.params[id] - state.preset[id]) < 1e-9);
   }
@@ -112,6 +114,7 @@
     const p = state.current;
     const percent = (state.phase * 100).toFixed(1);
     $('phaseValue').textContent = percent;
+    if (document.activeElement !== $('phaseNumber')) $('phaseNumber').value = percent;
     $('phase').value = state.phase * 100;
     setFill($('phase'));
     $('phase').setAttribute('aria-valuetext', '공전 ' + percent + '%');
@@ -123,6 +126,7 @@
   }
   function setView(view) {
     state.view = view;
+    $('sessionIcon').setAttribute('href', view === 'sky' ? '#i-sky' : '#i-orbit');
     $('viewport').dataset.view = view;
     const label = view === 'sky' ? '궤도 크게 보기' : '관측 크게 보기';
     $('cameraToggle').setAttribute('aria-pressed', String(view === 'orbit'));
@@ -131,9 +135,14 @@
     $('cameraToggle').querySelector('use').setAttribute('href', view === 'sky' ? '#i-orbit' : '#i-sky');
     $('contextSwap').setAttribute('aria-label', label);
     $('contextSwap').title = label;
+    $('cameraToggle').querySelector('.tool-label').textContent = view === 'sky' ? '궤도' : '관측';
+    $('viewName').textContent = view === 'sky' ? '지표 관측' : '공전 궤도';
+    $('contextLabel').textContent = view === 'sky' ? '공전 궤도' : '지표 관측';
+    window.NightEnvironment.updateCredit(view);
     invalidate();
   }
   function setAnalysis(open) {
+    if (open && window.innerWidth <= 850) togglePanel(false);
     state.analysis = open;
     $('analysisPanel').hidden = !open;
     $('viewport').classList.toggle('analysis-open', open);
@@ -164,6 +173,7 @@
   function togglePanel(force) {
     const workspace = document.querySelector('.workspace');
     const hidden = force === undefined ? !workspace.classList.contains('panel-hidden') : !force;
+    if (!hidden && window.innerWidth <= 850 && state.analysis) setAnalysis(false);
     workspace.classList.toggle('panel-hidden', hidden);
     const label = hidden ? '속성 패널 열기' : '속성 패널 숨기기';
     $('panelToggle').setAttribute('aria-expanded', String(!hidden));
@@ -240,6 +250,43 @@
   $('stepBack').addEventListener('click', () => seek(state.phase - 0.01));
   $('stepForward').addEventListener('click', () => seek(state.phase + 0.01));
   $('phase').addEventListener('input', () => seek(Number($('phase').value) / 100));
+  function setPhasePopover(open, restoreFocus = false) {
+    $('phasePopover').hidden = !open;
+    $('phaseToggle').setAttribute('aria-expanded', String(open));
+    if (open) {
+      $('phaseNumber').value = (state.phase * 100).toFixed(1);
+      $('phaseNumber').focus();
+      $('phaseNumber').select();
+    } else if (restoreFocus) $('phaseToggle').focus();
+  }
+  $('phaseToggle').addEventListener('click', () => setPhasePopover($('phasePopover').hidden));
+  $('phaseNumber').addEventListener('change', () => {
+    const value = $('phaseNumber').valueAsNumber;
+    if (Number.isFinite(value)) seek(P.clamp(value, 0, 100) / 100);
+    $('phaseNumber').value = (state.phase * 100).toFixed(1);
+  });
+  $('phaseNumber').addEventListener('keydown', event => {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      event.stopPropagation();
+      $('phaseNumber').dispatchEvent(new Event('change'));
+      setPhasePopover(false, true);
+    }
+  });
+  document.querySelectorAll('[data-phase]').forEach(button => button.addEventListener('click', () => {
+    seek(Number(button.dataset.phase) / 100);
+    $('phaseNumber').value = button.dataset.phase;
+  }));
+  document.addEventListener('pointerdown', event => {
+    if (!$('phasePopover').hidden && !event.target.closest('#phasePopover, #phaseToggle')) setPhasePopover(false);
+  });
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && !$('phasePopover').hidden) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      setPhasePopover(false, true);
+    }
+  });
   $('speed').addEventListener('change', () => { state.speed = Number($('speed').value); });
   $('gridToggle').addEventListener('click', () => toggleDisplay('grid', 'gridToggle'));
   $('trailToggle').addEventListener('click', () => toggleDisplay('trail', 'trailToggle'));
@@ -259,6 +306,7 @@
   });
   $('reset').addEventListener('click', () => {
     setPlaying(false);
+    setPhasePopover(false);
     state.phase = 0; state.params.lat = 30; state.compare = false; state.speed = 0.05;
     $('compareToggle').setAttribute('aria-pressed', 'false');
     $('speed').value = '0.05';
@@ -347,9 +395,16 @@
     invalidate();
   });
   const observer = new ResizeObserver(invalidate);
+  const inspectorObserver = new ResizeObserver(() => {
+    document.documentElement.style.setProperty('--inspector-bottom', $('inspector').getBoundingClientRect().bottom + 'px');
+    invalidate();
+  });
+  inspectorObserver.observe($('inspector'));
   for (const id of ['viewport', 'contextScene', 'plotScene']) observer.observe($(id));
   document.fonts.ready.then(invalidate);
+  window.addEventListener('environmentready', invalidate);
   togglePanel(window.innerWidth > 850);
   selectPlanet(earth);
   setView('sky');
+  setAnalysis(window.innerWidth > 850);
 })();

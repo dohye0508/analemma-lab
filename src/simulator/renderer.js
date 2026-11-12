@@ -19,6 +19,7 @@
       this.canvas = canvas; this.ctx = canvas.getContext('2d');
       this.compact = Boolean(options.compact);
       this.plot = Boolean(options.plot);
+      if (!this.plot) this.environment = new root.NightEnvironment();
       this.camera = { az: 180, alt: 43, fov: 90 };
       this.orbitCamera = { yaw: -0.38, pitch: 0.52, zoom: 1 };
       this.graphCamera = { x: 0, y: 0, zoom: 1 };
@@ -77,9 +78,11 @@
       this.ctx.clearRect(0, 0, this.w, this.h);
       this.ctx.lineWidth = 1; this.ctx.setLineDash([]);
       this.ctx.font = '14px Pretendard, sans-serif';
-      this.left = this.compact || this.plot ? 0 : root.innerWidth <= 600 ? 16 : 104;
-      this.right = this.w - (this.compact || this.plot ? 0 : 24);
-      this.safeTop = this.compact ? 8 : root.innerWidth <= 600 ? 106 : 32;
+      const layout = !this.compact && !this.plot ? getComputedStyle(document.documentElement) : null;
+      this.left = layout ? parseFloat(layout.getPropertyValue('--scene-left')) : 0;
+      this.right = this.w - (layout ? 20 : 0);
+      this.safeTop = layout ? parseFloat(layout.getPropertyValue('--scene-top')) : 8;
+      this.safeBottom = layout ? parseFloat(layout.getPropertyValue('--scene-bottom')) : 8;
       if (state.view === 'sky') this.sky();
       else if (state.view === 'orbit') this.orbit();
       else this.graph();
@@ -90,15 +93,15 @@
       const forward = direction(az, alt);
       const right = { x: Math.cos(az * RAD), y: 0, z: -Math.sin(az * RAD) };
       const up = { x: -Math.sin(az * RAD) * Math.sin(alt * RAD), y: Math.cos(alt * RAD), z: -Math.cos(az * RAD) * Math.sin(alt * RAD) };
-      const availableHeight = Math.max(90, this.h - this.safeTop);
-      const f = Math.min(availableHeight * 0.9, (this.right - this.left) * 2) / (2 * Math.tan(fov * RAD / 2));
+      const availableHeight = Math.max(90, this.h - this.safeTop - this.safeBottom);
+      const f = Math.min(availableHeight * 1.02, (this.right - this.left) * 2) / (2 * Math.tan(fov * RAD / 2));
       const cx = (this.left + this.right) / 2, cy = this.safeTop + availableHeight * 0.5;
       const projectVector = v => {
         const z = dot(v, forward);
         if (z < 0.09) return null;
         return { x: cx + f * dot(v, right) / z, y: cy - f * dot(v, up) / z };
       };
-      return { project: (azimuth, altitude) => projectVector(direction(azimuth, altitude)), projectVector, horizon: cy + f * Math.tan(alt * RAD), f };
+      return { project: (azimuth, altitude) => projectVector(direction(azimuth, altitude)), projectVector, horizon: cy + f * Math.tan(alt * RAD), f, cx, cy };
     }
 
     line(points, project, color, width = 1, dashed = false) {
@@ -132,6 +135,7 @@
         ground.addColorStop(0, '#1a2427'); ground.addColorStop(1, '#11181b');
         c.fillStyle = ground; c.fillRect(0, Math.max(0, horizon), w, h);
       }
+      const photographic = this.environment.render(c,w,h,projection,this.camera);
       if (state.grid) {
         for (let alt = -60; alt <= 75; alt += 15) {
           const points = Array.from({ length: 361 }, (_, az) => ({ az, alt }));
@@ -144,7 +148,7 @@
           this.line(points, p => projection.project(p.az, p.alt), '#8099b11e');
         }
       }
-      if (horizon > 0 && horizon < h) {
+      if ((!photographic || state.grid) && horizon > 0 && horizon < h) {
         c.strokeStyle = '#91a0a14a'; c.beginPath(); c.moveTo(0, horizon); c.lineTo(w, horizon); c.stroke();
       }
       for (const [az, name] of [[0, 'N'], [90, 'E'], [180, 'S'], [270, 'W']]) {
@@ -161,7 +165,10 @@
       }
       const sun = projection.project(state.current.az, state.current.alt);
       this.sunVisible = !!sun && sun.x > this.left && sun.x < this.right && sun.y > this.safeTop && sun.y < h - 30;
-      if (sun) this.sun(sun.x, sun.y, state.current.alt < 0);
+      if (sun) {
+        this.sun(sun.x, sun.y, state.current.alt < 0);
+        if (!this.compact) this.label('태양',sun.x+19,sun.y-12,'#f1d5a8','left','13px Pretendard,sans-serif');
+      }
     }
 
     sun(x, y, below = false) {
@@ -184,6 +191,7 @@
     orbit() {
       const { ctx: c, w, h, state } = this;
       c.fillStyle = '#090d13'; c.fillRect(0, 0, w, h);
+      if (!this.compact) this.environment.render(c,w,h,{cx:w/2,cy:h/2,f:h*.65},{az:this.orbitCamera.yaw/RAD+180,alt:10},true);
       const camera = this.orbitCamera;
       const cx = (this.left + this.right) / 2, cy = h * 0.56;
       const scale = Math.min((this.right - this.left) * 0.37, h * 0.37) * camera.zoom / (1 + state.params.ecc);
@@ -233,11 +241,16 @@
     planet(c, x, y, r, preset, lightX, lightY) {
       c.save(); circle(c, x, y, r, preset.color); c.beginPath(); c.arc(x, y, r, 0, TAU); c.clip();
       if (preset.id === 'earth') {
+        const texture = root.NightEnvironment.earth;
+        if (texture.complete && texture.naturalWidth) {
+          c.drawImage(texture,texture.width*.38,texture.height*.12,texture.width*.32,texture.height*.76,x-r,y-r,r*2,r*2);
+        } else {
         c.fillStyle = '#618c78';
         for (const poly of [[[-.75,-.5],[-.25,-.72],[.05,-.3],[-.18,.05],[-.45,.0]],[[.1,-.38],[.65,-.15],[.4,.2],[.5,.55],[.15,.75],[-.03,.22]]]) {
           c.beginPath(); poly.forEach(([a,b],i) => i ? c.lineTo(x+a*r,y+b*r) : c.moveTo(x+a*r,y+b*r)); c.closePath(); c.fill();
         }
         c.fillStyle = '#d7e7e85e'; c.fillRect(x-r, y-r, r*2, r*.15);
+        }
       } else if (['jupiter','saturn','venus'].includes(preset.id)) {
         c.fillStyle = '#684b362b';
         for (let band = -0.6; band < 1; band += 0.38) c.fillRect(x-r, y+band*r, 2*r, r*.17);
