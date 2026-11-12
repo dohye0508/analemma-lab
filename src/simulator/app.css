@@ -427,3 +427,20 @@ dialog::backdrop { background:#080c12a8; }
   .property { padding:12px 0; }
 }
 @media(max-height:500px) { .camera-tools { bottom:58px; } }
+
+.environment-body { padding:18px; }
+.background-choices { display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px; }
+.background-choices button { padding:5px;border:1px solid #a8bdcd36;text-align:left;font-size:14px; }
+.background-choices button[aria-pressed=true] { border-color:#b5dfce;background:#b5dfce10; }
+.background-choices button > span:last-child { display:block;padding:8px 3px 4px; }
+.background-preview { display:block;height:86px;background-size:cover;background-position:center; }
+.background-preview.desert { background-image:url('../../assets/atacama.jpg'); }
+.background-preview.galaxy { background-image:url('../../assets/milky-way.jpg'); }
+.background-preview.plain { background:linear-gradient(#080e18,#203643 65%,#11181b 66%); }
+.environment-setting { display:grid;grid-template-columns:1fr auto;gap:8px;margin-top:22px;font-size:14px; }
+.environment-setting input { grid-column:1/-1; }
+.environment-setting output { color:#b5cbd8; }
+.environment-setting:has(input:disabled) { opacity:.4; }
+.environment-reset { margin-top:20px;padding:9px 12px;border:1px solid #abc2d237;font-size:13px; }
+@media(min-width:851px) and (max-width:1180px) { .tool-dock .icon-button { width:49px; } }
+@media(max-width:420px) { .environment-body { padding:12px; }.background-preview { height:64px; } }

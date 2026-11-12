@@ -118,6 +118,23 @@
       c.stroke(); c.setLineDash([]);
     }
 
+    depthTrail(points, project, color, width, dashed) {
+      const c=this.ctx, current=direction(this.state.current.az,this.state.current.alt);
+      const projected=points.map(project);
+      // Quantized opacity keeps a continuous trajectory while batching strokes.
+      const buckets=Array.from({length:8},()=>[]);
+      for(let i=1;i<points.length;i++) {
+        const a=projected[i-1],b=projected[i];
+        if(!a||!b||Math.hypot(b.x-a.x,b.y-a.y)>Math.max(this.w,this.h)*.7)continue;
+        const angle=Math.acos(clamp(dot(current,direction(points[i].az,points[i].alt)),-1,1));
+        buckets[Math.min(7,Math.floor(angle/(60*RAD)*8))].push([a,b]);
+      }
+      c.save();c.strokeStyle=color;c.lineWidth=width;c.lineCap='round';
+      c.setLineDash(dashed?[4,5]:[]);
+      buckets.forEach((segments,index)=>{c.globalAlpha=1-.22*index/7;c.beginPath();for(const [a,b] of segments){c.moveTo(a.x,a.y);c.lineTo(b.x,b.y);}c.stroke();});
+      c.restore();
+    }
+
     label(text, x, y, color = '#a0b0c3', align = 'left', font = '14px Pretendard, sans-serif') {
       const c = this.ctx;
       c.font = font; c.textAlign = align; c.fillStyle = color; c.fillText(text, x, y); c.textAlign = 'left';
@@ -159,15 +176,16 @@
         [...state.curves].reverse().forEach(curve => {
           const points = curve.points.concat(curve.points[0]);
           const width = this.compact ? 1.4 : curve.main ? 2.5 : 1.6;
-          this.line(points, p => p.alt >= 0 ? projection.project(p.az, p.alt) : null, curve.color, width, !curve.main);
+          (curve.main ? this.depthTrail : this.line).call(this, points, p => p.alt >= 0 ? projection.project(p.az, p.alt) : null, curve.color, width, !curve.main);
           this.line(points, p => p.alt < 0 ? projection.project(p.az, p.alt) : null, curve.color + 'aa', width, true);
+          if(curve.main && !this.compact) for(let step=0;step<4;step++) { const p=curve.points[Math.floor(step*curve.points.length/4)];const q=projection.project(p.az,p.alt);if(q) { c.save();c.globalAlpha=.5;circle(c,q.x,q.y,2,curve.color);c.restore(); } }
         });
       }
       const sun = projection.project(state.current.az, state.current.alt);
       this.sunVisible = !!sun && sun.x > this.left && sun.x < this.right && sun.y > this.safeTop && sun.y < h - 30;
       if (sun) {
         this.sun(sun.x, sun.y, state.current.alt < 0);
-        if (!this.compact) this.label('태양',sun.x+19,sun.y-12,'#f1d5a8','left','13px Pretendard,sans-serif');
+        if (!this.compact) { c.save();c.shadowColor='#000';c.shadowBlur=5;this.label('태양',sun.x+19,sun.y-12,'#f1d5a8','left','13px Pretendard,sans-serif');c.restore(); }
       }
     }
 

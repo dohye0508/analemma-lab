@@ -119,3 +119,15 @@ falls back to a flat photograph or the original scene background.
 
 [Pretendard v1.3.9](https://github.com/orioncactus/pretendard) is included under
 the SIL Open Font License 1.1; see `fonts/pretendard/LICENSE`.
+
+## Background and trajectory detail
+
+The Background button selects Atacama, Milky Way, or a plain environment. Brightness
+and panorama rotation can be adjusted and are stored locally in the browser; the
+background reset restores only these settings. No uploaded data or server storage
+is involved. Photo credits follow the selected image in Help.
+
+The primary sky trail fades by at most 22% with angular separation from the current
+Sun, without implying physical distance. Small quarter-orbit markers and a subtle
+shadow behind the Sun label improve legibility. Comparison and below-horizon
+trajectories keep their dashed styling. Physics is unchanged.

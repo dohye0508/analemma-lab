@@ -294,6 +294,23 @@
   $('fullscreen').addEventListener('click', fullscreen);
   $('panelToggle').addEventListener('click', () => togglePanel());
   $('closePanel').addEventListener('click', () => togglePanel(false));
+  function syncEnvironment() {
+    const prefs = window.NightEnvironment.preferences;
+    document.querySelectorAll('[data-background]').forEach(b => b.setAttribute('aria-pressed',String(b.dataset.background === prefs.background)));
+    $('backgroundBrightness').value=prefs.brightness;
+    $('backgroundRotation').value=prefs.rotation;
+    $('brightnessValue').textContent=prefs.brightness+'%';
+    $('rotationValue').textContent=prefs.rotation+'°';
+    for(const id of ['backgroundBrightness','backgroundRotation']) { $(id).disabled=prefs.background==='plain'; setFill($(id)); }
+    window.NightEnvironment.updateCredit(state.view);
+    invalidate();
+  }
+  $('environmentToggle').addEventListener('click', () => { syncEnvironment(); $('environmentDialog').showModal(); });
+  $('closeEnvironment').addEventListener('click', () => $('environmentDialog').close());
+  $('environmentDialog').addEventListener('close', () => $('environmentToggle').focus());
+  document.querySelectorAll('[data-background]').forEach(button => button.addEventListener('click', () => { window.NightEnvironment.configure({ background:button.dataset.background }); syncEnvironment(); }));
+  for(const [id,key] of [['backgroundBrightness','brightness'],['backgroundRotation','rotation']]) $(id).addEventListener('input', () => { window.NightEnvironment.configure({ [key]:Number($(id).value) }); syncEnvironment(); });
+  $('resetEnvironment').addEventListener('click', () => { window.NightEnvironment.reset(); syncEnvironment(); });
   $('help').addEventListener('click', () => { $('helpDialog').showModal(); });
   $('closeHelp').addEventListener('click', () => $('helpDialog').close());
   $('helpDialog').addEventListener('click', event => {
@@ -356,7 +373,7 @@
   attachCamera($('scene'), renderer, () => state.view);
   attachCamera($('plotScene'), graphRenderer, () => 'graph');
   document.addEventListener('keydown', event => {
-    if (event.ctrlKey || event.metaKey || event.altKey || $('helpDialog').open) return;
+    if (event.ctrlKey || event.metaKey || event.altKey || $('helpDialog').open || $('environmentDialog').open) return;
     if (event.target.closest('input,select,textarea,[contenteditable="true"]')) return;
     const key = event.key.toLowerCase();
     const targetRenderer = event.target === $('plotScene') ? graphRenderer : renderer;

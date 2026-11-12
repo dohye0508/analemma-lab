@@ -7,6 +7,14 @@
     galaxy: { file: 'milky-way.jpg', credit: 'ESO/S. Brunier', url: 'https://www.eso.org/public/images/eso0932a/' },
     earth: { file: 'earth.jpg', credit: 'Solar System Scope', url: 'https://www.solarsystemscope.com/textures/' }
   };
+  const defaults = { background:'atacama', brightness:100, rotation:0 };
+  let preferences = { ...defaults };
+  function validated(value) {
+    return { background:['atacama','galaxy','plain'].includes(value.background) ? value.background : 'atacama',
+      brightness:Number.isFinite(Number(value.brightness)) ? Math.max(30,Math.min(140,Number(value.brightness))) : 100,
+      rotation:Number.isFinite(Number(value.rotation)) ? Math.max(0,Math.min(360,Number(value.rotation))) : 0 };
+  }
+  try { preferences = validated(JSON.parse(localStorage.getItem('analemma-environment')) || defaults); } catch {}
   const images = {};
   let pending = Object.keys(sources).length;
   for (const [key, source] of Object.entries(sources)) {
@@ -72,11 +80,14 @@
       }
     }
     render(ctx, w, h, projection, camera, orbit = false) {
-      const key = orbit ? 'galaxy' : settings.image;
+      if (preferences.background === 'plain') return false;
+      const key = orbit ? 'galaxy' : preferences.background;
       const img = images[key];
       if (!img.complete || !img.naturalWidth) return false;
-      const cfg = orbit ? { rotate: .08, exposure: .24, top: 90, span: 180 } : settings;
-      const cache = [key,w,h,projection.cx,projection.cy,projection.f,camera.az,camera.alt].join(':');
+      const cfg = { ...(orbit || key === 'galaxy' ? { rotate:.08, exposure:orbit ? .24 : .50, top:90, span:180 } : settings) };
+      cfg.exposure *= preferences.brightness / 100;
+      cfg.rotate += preferences.rotation / 360;
+      const cache = [key,cfg.exposure,cfg.rotate,w,h,projection.cx,projection.cy,projection.f,camera.az,camera.alt].join(':');
       const gl = this.gl;
       if (!gl) {
         const scale = Math.max(w/img.width, h/img.height);
@@ -117,12 +128,19 @@
       return true;
     }
     static updateCredit(view) {
-      const source = sources[view === 'orbit' ? 'galaxy' : settings.image];
+      const source = preferences.background === 'plain' ? null : sources[view === 'orbit' ? 'galaxy' : preferences.background];
       const el = document.getElementById('photoCredit');
-      if (el) { el.href=source.url; el.textContent=source.credit+' · CC BY 4.0'; }
+      if (el) { el.hidden=!source; if(source) { el.href=source.url; el.textContent=source.credit+' · CC BY 4.0'; } }
       const details = document.getElementById('photoDetails');
-      if (details) details.textContent='사진: '+source.credit+'. 밝기 조정 및 구면 투영을 적용했습니다.';
+      if (details) details.textContent=source ? '사진: '+source.credit+'. 밝기 조정 및 구면 투영을 적용했습니다.' : '단색 하늘과 지평선을 표시합니다.';
     }
+    static get preferences() { return { ...preferences }; }
+    static configure(next) {
+      preferences = validated({ ...preferences, ...next });
+      try { localStorage.setItem('analemma-environment',JSON.stringify(preferences)); } catch {}
+      root.dispatchEvent(new Event('environmentready'));
+    }
+    static reset() { this.configure(defaults); }
     static get earth() { return images.earth; }
   }
   root.NightEnvironment=NightEnvironment;
