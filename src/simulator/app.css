@@ -385,3 +385,25 @@ dialog::backdrop { background:#080c12a8; }
   .properties { flex-shrink:0; }
   .annual-stats { margin-top:auto; }
 }
+
+/* Stable internal spacing; extra rail height belongs to the graph. */
+@media(min-width:851px) {
+  :root:has(.analysis-panel:not([hidden])) .inspector { height:546px; max-height:calc(100% - 210px); }
+  .inspector-scroll { display:flex; flex-direction:column; justify-content:flex-start; padding-bottom:12px; }
+  .planet-picker { row-gap:8px; padding-top:8px; padding-bottom:14px; }
+  .properties { flex:0 0 auto; min-height:0; display:block; padding:6px 0; }
+  .property { padding:7px 0; }
+  .live-readings { padding:12px 0; }
+  .annual-stats { margin-top:0; }
+  .analysis-panel:not(.expanded) { height:calc(100% - var(--inspector-bottom)); max-height:none; }
+  :root:has(.workspace.panel-hidden) .analysis-panel:not(.expanded) { height:100%; }
+  .tool-dock { left:calc(50% + var(--tools-left)/2); transform:translateX(-50%); padding:6px; }
+  .tool-group { gap:3px; padding-left:6px; padding-right:6px; }
+}
+@media(min-width:851px) and (max-width:1180px) {
+  .tool-group { gap:1px; padding-left:3px; padding-right:3px; }
+}
+@media(max-width:850px) and (min-width:701px) {
+  .tool-dock { left:50%; transform:translateX(-50%); padding:6px; }
+  .tool-group { gap:2px; }
+}
