@@ -480,3 +480,5 @@ select option { color:#e1e9ef; background:#182129; }
 .background-choices button[aria-pressed=true] { border-color:#587f75; background:#b5dfce10; }
 .background-choices button:focus { outline:none; }
 .background-choices button:focus-visible { outline:2px solid #587f75; outline-offset:2px; }
+/* Keep planet spacing independent of the inspector width. */
+.planet-picker { grid-template-columns:repeat(3,64px); column-gap:4px; justify-content:center; margin-left:0; margin-right:0; }
