@@ -40,7 +40,7 @@ button[aria-pressed=true],button[aria-expanded=true] { color:var(--accent); }
 .selected-object .icon { width:26px; height:26px; }
 .modified { width:5px; height:5px; background:var(--accent); border-radius:50%; flex:none; }
 .inspector-scroll { min-height:0; overflow-y:auto; scrollbar-width:thin; scrollbar-color:#63717c transparent; padding:0 13px 5px; }
-.planet-picker { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:2px; padding:0 0 10px; margin:0 -4px; }
+.planet-picker { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:2px; padding:0 0 10px; margin:0 -4px; }
 .object-button { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:7px; height:66px; min-width:0; border:1px solid transparent; border-radius:3px; }
 .object-button .planet { width:35px; height:35px; }
 .planet-label { font-size:12px; color:#bac8d3; line-height:1.1; }
@@ -460,3 +460,8 @@ dialog::backdrop { background:#080c12a8; }
 
 .inspector { background:#10171d; }
 .tool-dock { background:#0b1116f5; }
+
+/* Native speed menus follow the dark simulation palette. */
+select { color-scheme:dark; }
+select option { color:#e1e9ef; background:#182129; }
+.tool-dock .icon { width:30px; height:30px; }
