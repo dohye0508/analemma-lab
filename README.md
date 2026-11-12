@@ -38,8 +38,7 @@ independent for each view.
 
 The left inspector contains eight planet presets and the original four physical
 parameters. Playback, direct percentage entry, quarter-orbit jumps, grid, trails,
-and latitude comparison remain available. Dragging the observation camera uses
-the reversed direction requested for this interface; graph dragging is unchanged.
+and latitude comparison remain available. Dragging the observation camera follows pointer movement; graph dragging is unchanged.
 Keyboard 1/2/3 selects observation/orbit/graph, Space plays or pauses, R fits the
 camera, G/T toggles the grid/trail, and F toggles fullscreen.
 
