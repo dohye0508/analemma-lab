@@ -53,7 +53,7 @@
 <div class="scene-legend" id="legend" aria-label="위도 범례" hidden></div>
         <button id="findSun" class="find-sun" hidden><svg class="icon" aria-hidden="true"><use href="#i-sun"/></svg><span>태양 찾기</span></button>
       </section>
-      <aside class="inspector" id="inspector" aria-label="행성 속성">
+      <button id="panelEdge" class="panel-edge" aria-label="속성 패널 숨기기" aria-expanded="true" aria-controls="inspector"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14 6-6 6 6 6"/></svg></button><aside class="inspector" id="inspector" aria-label="행성 속성">
         <header class="selected-object"><span id="selectedPlanet" class="planet earth" aria-hidden="true"></span><h1 id="planetName">지구</h1><span id="modified" class="modified" title="기본값에서 수정됨" aria-label="기본값에서 수정됨" hidden></span><button id="restorePreset" class="icon-button" aria-label="행성 기본값 복원" title="행성 기본값 복원" ><svg class="icon" aria-hidden="true"><use href="#i-reset"/></svg></button><button id="closePanel" class="icon-button" aria-label="속성 패널 닫기" title="속성 패널 닫기" ><svg class="icon" aria-hidden="true"><use href="#i-close"/></svg></button></header>
         <div class="inspector-scroll">
           <div id="properties" class="properties"></div>

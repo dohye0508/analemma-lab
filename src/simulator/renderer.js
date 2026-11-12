@@ -132,7 +132,7 @@
       c.save();c.strokeStyle=color;c.lineWidth=width;c.lineCap='round';
       if(root.NightEnvironment.preferences.background !== 'atacama') { c.shadowColor='#0009'; c.shadowBlur=3; }
       c.setLineDash(dashed?[4,5]:[]);
-      buckets.forEach((segments,index)=>{c.globalAlpha=1-.22*index/7;c.beginPath();for(const [a,b] of segments){c.moveTo(a.x,a.y);c.lineTo(b.x,b.y);}c.stroke();});
+      buckets.forEach((segments,index)=>{c.globalAlpha=1-.35*index/7;c.beginPath();for(const [a,b] of segments){c.moveTo(a.x,a.y);c.lineTo(b.x,b.y);}c.stroke();});
       c.restore();
     }
 
@@ -224,10 +224,21 @@
         }
       }
       const points = state.curves[0].points.map(p => this.orbitalPoint(p));
+      const depths = points.map(p => p.x * Math.sin(camera.yaw) + p.z * Math.cos(camera.yaw));
+      const near = Math.max(...depths), far = Math.min(...depths);
+      const orbitLine = (path, color, width) => {
+        c.save();
+        for (let i = 1; i < path.length; i++) {
+          const p = path[i], depth = p.x * Math.sin(camera.yaw) + p.z * Math.cos(camera.yaw);
+          c.globalAlpha = 1 - .35 * (near - depth) / Math.max(.001, near - far);
+          this.line([path[i - 1], p], project, color, width);
+        }
+        c.restore();
+      };
       if (state.trail) {
-        this.line(points.concat(points[0]), project, '#8fa2bba0', this.compact ? 1.3 : 1.8);
+        orbitLine(points.concat(points[0]), '#8fa2bba0', this.compact ? 1.3 : 1.8);
         const end = Math.floor(state.phase * points.length);
-        this.line(points.slice(0, end + 1), project, '#d5b07a90', 1.5);
+        orbitLine(points.slice(0, end + 1), '#d5b07a90', 1.5);
       }
       const planetPosition = this.orbitalPoint(state.current), q = project(planetPosition), s = project({ x: 0, y: 0, z: 0 });
       this.line([{ x: 0, y: 0, z: 0 }, planetPosition], project, '#d3ab6c50', 1, true);

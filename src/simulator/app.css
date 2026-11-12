@@ -467,16 +467,16 @@ select option { color:#e1e9ef; background:#182129; }
 .tool-dock .icon { width:30px; height:30px; }
 
 /* Compact the inspector without hiding controls on shorter screens. */
-.inspector { width:224px; }
-.inspector-scroll { padding-left:4px; padding-right:4px; padding-bottom:8px; }
+.inspector { width:232px; }
+.inspector-scroll { padding-left:8px; padding-right:8px; padding-bottom:8px; }
 .planet-picker { row-gap:4px; padding-top:4px; padding-bottom:8px; }
 .object-button { height:62px; gap:4px; }
 .property { padding:12px 0; }
 .live-readings { padding-top:10px; padding-bottom:10px; }
 @media(min-width:851px) {
-  :root { --scene-left:242px; --tools-left:224px; }
+  :root { --scene-left:250px; --tools-left:232px; }
 }
-@media(max-width:700px) { .inspector { width:min(224px,100%); } }
+@media(max-width:700px) { .inspector { width:min(232px,100%); } }
 .background-choices button[aria-pressed=true] { border-color:#587f75; background:#b5dfce10; }
 .background-choices button:focus { outline:none; }
 .background-choices button:focus-visible { outline:2px solid #587f75; outline-offset:2px; }
@@ -484,3 +484,8 @@ select option { color:#e1e9ef; background:#182129; }
 .planet-picker { grid-template-columns:repeat(3,64px); column-gap:4px; justify-content:center; margin-left:0; margin-right:0; }
 
 .properties { padding-left:4px; padding-right:4px; }
+
+.panel-edge { position:absolute; z-index:31; left:232px; top:50%; transform:translateY(-50%); width:24px; height:52px; padding:2px; background:#10171def; border:1px solid #bfccd52b; border-left:0; border-radius:0 5px 5px 0; pointer-events:auto; }
+.panel-edge svg { width:20px; height:24px; fill:none; stroke:currentColor; stroke-width:1.6; }
+.workspace.panel-hidden .panel-edge { left:0; }
+.workspace.panel-hidden .panel-edge svg { transform:rotate(180deg); }
