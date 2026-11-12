@@ -167,6 +167,8 @@
     $('panelToggle').setAttribute('aria-expanded', String(!hidden));
     $('panelToggle').setAttribute('aria-label', label);
     $('panelToggle').title = label;
+    $('panelEdge').setAttribute('aria-expanded', String(!hidden));
+    $('panelEdge').setAttribute('aria-label', label);
     if (hidden && $('inspector').contains(document.activeElement)) $('panelToggle').focus();
     invalidate();
   }
@@ -274,6 +276,7 @@
   $('fullscreen').addEventListener('click', fullscreen);
   $('panelToggle').addEventListener('click', () => togglePanel());
   $('closePanel').addEventListener('click', () => togglePanel(false));
+  $('panelEdge').addEventListener('click', () => togglePanel());
   function syncEnvironment() {
     const prefs = window.NightEnvironment.preferences;
     document.querySelectorAll('[data-background]').forEach(b => b.setAttribute('aria-pressed',String(b.dataset.background === prefs.background)));
