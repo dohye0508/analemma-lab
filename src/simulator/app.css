@@ -374,7 +374,14 @@ dialog::backdrop { background:#080c12a8; }
 @media(min-width:851px) and (max-height:720px) {
   :root:has(.analysis-panel:not([hidden])) .inspector { height:calc(100% - 210px); max-height:calc(100% - 210px); }
   .analysis-panel:not(.expanded) { height:210px; }
-  .inspector-scroll { display:block; }
   .planet-picker { row-gap:2px; }
-  .properties { display:block; }
+}
+
+/* Keep values subordinate to their labels and prevent a blank rail footer. */
+.number-field input { font-size:14px; font-weight:400; }
+.live-readings dd { font-size:14px; font-weight:400; }
+.annual-stats dd { font-size:14px; }
+@media(min-width:851px) {
+  .properties { flex-shrink:0; }
+  .annual-stats { margin-top:auto; }
 }
