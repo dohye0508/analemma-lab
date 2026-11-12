@@ -468,7 +468,7 @@ select option { color:#e1e9ef; background:#182129; }
 
 /* Compact the inspector without hiding controls on shorter screens. */
 .inspector { width:272px; }
-.inspector-scroll { padding-left:8px; padding-right:8px; padding-bottom:8px; }
+.inspector-scroll { padding-left:4px; padding-right:4px; padding-bottom:8px; }
 .planet-picker { row-gap:4px; padding-top:4px; padding-bottom:8px; }
 .object-button { height:62px; gap:4px; }
 .property { padding:12px 0; }

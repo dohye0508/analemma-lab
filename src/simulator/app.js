@@ -322,7 +322,7 @@
       if (!previous) return;
       const before = distance();
       pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
-      if (pointers.size === 1) viewRenderer.pan(viewName(), (event.clientX - previous.x) * (viewName() === 'sky' ? -1 : 1), (event.clientY - previous.y) * (viewName() === 'sky' ? -1 : 1));
+      if (pointers.size === 1) viewRenderer.pan(viewName(), event.clientX - previous.x, event.clientY - previous.y);
       else {
         const after = distance();
         if (before > 0 && after > 0) viewRenderer.zoom(viewName(), before / after);
