@@ -1,0 +1,45 @@
+Photographic assets
+
+All images are included under Creative Commons Attribution 4.0:
+https://creativecommons.org/licenses/by/4.0/
+
+assets/atacama.jpg
+Credit: ESO/B. Tafreshi
+Source: https://www.eso.org/public/images/uhd_img2563pv2_cc_eq/
+Download: https://cdn.eso.org/images/publicationjpg/uhd_img2563pv2_cc_eq.jpg
+
+assets/milky-way.jpg
+Credit: ESO/S. Brunier
+Source: https://www.eso.org/public/images/eso0932a/
+Download: https://cdn.eso.org/images/publicationjpg/eso0932a.jpg
+
+assets/earth.jpg
+Credit: Solar System Scope
+Source: https://www.solarsystemscope.com/textures/
+Download: https://www.solarsystemscope.com/textures/download/2k_earth_daymap.jpg
+
+ESO usage terms: https://www.eso.org/public/copyright/
+
+Adaptations: the website adjusts exposure and applies spherical projection to the night photographs; the Earth map is cropped and shaded on the displayed body. Image files are retained as downloaded. The photographs provide an illustrative environment, not a calculated star field for the simulation's latitude/time.
+
+Ground panorama additions — Poly Haven, CC0 (https://polyhaven.com/license)
+
+언덕: assets/hilly_terrain_01.jpg
+https://polyhaven.com/a/hilly_terrain_01
+Source: https://dl.polyhaven.org/file/ph-assets/HDRIs/extra/Tonemapped%20JPG/hilly_terrain_01.jpg
+
+초원: assets/kloppenheim_03.jpg
+https://polyhaven.com/a/kloppenheim_03
+Source: https://dl.polyhaven.org/file/ph-assets/HDRIs/extra/Tonemapped%20JPG/kloppenheim_03.jpg
+
+일출: assets/spruit_sunrise.jpg
+https://polyhaven.com/a/spruit_sunrise
+Source: https://dl.polyhaven.org/file/ph-assets/HDRIs/extra/Tonemapped%20JPG/spruit_sunrise.jpg
+
+숲: assets/forest_slope.jpg
+https://polyhaven.com/a/forest_slope
+Source: https://dl.polyhaven.org/file/ph-assets/HDRIs/extra/Tonemapped%20JPG/forest_slope.jpg
+
+설원: assets/snowy_park_01.jpg
+https://polyhaven.com/a/snowy_park_01
+Source: https://dl.polyhaven.org/file/ph-assets/HDRIs/extra/Tonemapped%20JPG/snowy_park_01.jpg
