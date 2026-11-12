@@ -30,53 +30,31 @@ where browser texture security prevents spherical rendering.
 
 ## Simulation workspace
 
-- The sky and orbital position share one workspace and timeline. Click the
-  orbital thumbnail or camera icon to swap the main and contextual views.
-  There is no separate tab navigation. Below-horizon sky trajectories are dashed;
-  the orbital view shows the inertially fixed tilted axis. Body sizes are
-  exaggerated for visibility.
-- The chart icon opens the original azimuth–altitude graph over the scene.
-  It supports independent pan/zoom, expansion, and overlays at 0°, 30°, 60°,
-  and 89°N. Opening it preserves the main camera and playback state.
-- The selected C layout docks a compact inspector and graph in a single left
-  column. The centered top toolbar uses nine primary icons with short Korean labels.
-  Zoom and camera fit use a separate compact icon strip on the right.
-  Panels end where their content ends, exposing the photographic scene. Property
-  names (15px) and editable values (16px) share a row; each property occupies
-  75px including its slider. The bottom playback control is 48px high.
-- Click the orbital percentage to open a compact seek panel: drag the slider,
-  type a percentage, or use 0/25/50/75/100% checkpoints. Enter applies and closes;
-  Escape closes and returns focus. Playback and the eight presets remain wired
-  to the same simulation state. No on-screen product wordmark is shown.
-- The inspector retains the eight presets, obliquity (0–180°), eccentricity
-  (0–0.9), perihelion direction (0–360°), and observer latitude (−89–89°).
-  Numeric inputs retain the full preset precision. Changed presets are marked
-  and can be restored without changing the observer latitude.
-- Playback and scrubbing use a normalized orbital period. 0% is perihelion,
-  50% is aphelion; this is not a calendar date or continuous diurnal motion.
-  Each frame samples the Sun at local **mean** solar noon.
+The main canvas switches between observation, orbit, and graph views. The graph
+button replaces the scene and returns to the preceding view when pressed again.
+The graph uses equal angular scale on both axes, separate axis-title margins,
+and tick spacing based on the available screen size. Camera pan and zoom are
+independent for each view.
 
-Drag the viewport to move the camera; scroll or pinch to zoom. `Space` toggles
-playback, `R` fits the cameras, `G` toggles the grid, `T` toggles the trail,
-`1`/`2` select the main camera, and `3` opens/closes the graph overlay.
-`F` toggles fullscreen and `?` opens help. Focus either interactive canvas to
-use arrows and `+`/`−` on that camera. Editing form fields does not trigger these
-shortcuts. On narrow screens, the properties button opens the inspector, which
-contains all eight planet presets. The graph and inspector share the overlay
-space on phones. The toolbar becomes two rows while keeping every action
-visible, with icons remaining large.
+The left inspector contains eight planet presets and the original four physical
+parameters. Playback, direct percentage entry, quarter-orbit jumps, grid, trails,
+and latitude comparison remain available. Dragging the observation camera uses
+the reversed direction requested for this interface; graph dragging is unchanged.
+Keyboard 1/2/3 selects observation/orbit/graph, Space plays or pauses, R fits the
+camera, G/T toggles the grid/trail, and F toggles fullscreen.
 
-The model retains the original geometric assumptions and retrograde mean-Sun
-handling. It does not model atmospheric refraction, real terrain, or spin–orbit
-resonance. The equation of time is displayed in angular degrees for consistent
-comparison between planets. Geographic poles are capped at ±89° to avoid the
-azimuth singularity and are labeled with their actual computed latitude.
+The Background button provides six ground panoramas: Atacama, hills, grassland,
+sunrise, forest, and snow. Brightness and rotation are saved locally. Former
+space-only background preferences migrate to Atacama. Orbital space retains its
+separate celestial environment. Background photographs are illustrative, not
+computed star maps. Credits are inside the background dialog and in
+`assets/CREDITS.txt`. There is no Help button or help dialog.
 
-Run the dependency-free physics checks with Node.js:
+The main sky trail fades by at most 22% with angular separation from the current
+Sun. Quarter-orbit markers and subtle text shadows improve legibility; comparison
+and below-horizon paths retain dashed styling. Physics remains unchanged.
 
-```sh
-node --test tests/physics.test.cjs
-```
+Run the dependency-free checks with `node --test tests/physics.test.cjs`.
 
 ## Project layout
 
@@ -104,30 +82,10 @@ tests/                  physics regression and boundary checks
 3. `npm install docx`, then run `src/report/build_report.js` to build a
    docx report from the plots in `data/`.
 
-## Interface, photographs, and font
+## Photographs and font
 
-The dense property rows and edge-aligned panels follow the supplied Universe
-Sandbox running screenshot. The selected C design keeps short labels, large
-icons, a compact playback control, and the main simulation in one workspace.
-
-ESO/B. Tafreshi's Atacama panorama is projected around the sky camera with WebGL.
-ESO/S. Brunier's Milky Way panorama supplies the orbital background; the Earth
-surface uses Solar System Scope's texture. Full links, CC BY 4.0 credits, and
-adaptations are listed in `assets/CREDITS.txt` and in help. These are illustrative photographs, not a current-location star map;
-the original mean-solar-noon model remains unchanged. Failed image/WebGL loading
-falls back to a flat photograph or the original scene background.
-
-[Pretendard v1.3.9](https://github.com/orioncactus/pretendard) is included under
-the SIL Open Font License 1.1; see `fonts/pretendard/LICENSE`.
-
-## Background and trajectory detail
-
-The Background button selects Atacama, Milky Way, or a plain environment. Brightness
-and panorama rotation can be adjusted and are stored locally in the browser; the
-background reset restores only these settings. No uploaded data or server storage
-is involved. Photo credits follow the selected image in Help.
-
-The primary sky trail fades by at most 22% with angular separation from the current
-Sun, without implying physical distance. Small quarter-orbit markers and a subtle
-shadow behind the Sun label improve legibility. Comparison and below-horizon
-trajectories keep their dashed styling. Physics is unchanged.
+Ground landscapes from Poly Haven are CC0; ESO photographs and the Solar System
+Scope Earth texture are CC BY 4.0. See `assets/CREDITS.txt` for source links.
+Panoramas are bounded to the device texture limit during WebGL upload; additional
+backgrounds load when selected. Pretendard is bundled under SIL OFL 1.1 in
+`fonts/pretendard/LICENSE`.

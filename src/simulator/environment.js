@@ -5,26 +5,32 @@
   const sources = {
     atacama: { file: 'atacama.jpg', credit: 'ESO/B. Tafreshi', url: 'https://www.eso.org/public/images/uhd_img2563pv2_cc_eq/' },
     galaxy: { file: 'milky-way.jpg', credit: 'ESO/S. Brunier', url: 'https://www.eso.org/public/images/eso0932a/' },
+    hilly_terrain_01: { file:'hilly_terrain_01.jpg', credit:'Poly Haven', license:'CC0', url:'https://polyhaven.com/a/hilly_terrain_01' },
+    kloppenheim_03: { file:'kloppenheim_03.jpg', credit:'Poly Haven', license:'CC0', url:'https://polyhaven.com/a/kloppenheim_03' },
+    spruit_sunrise: { file:'spruit_sunrise.jpg', credit:'Poly Haven', license:'CC0', url:'https://polyhaven.com/a/spruit_sunrise' },
+    forest_slope: { file:'forest_slope.jpg', credit:'Poly Haven', license:'CC0', url:'https://polyhaven.com/a/forest_slope' },
+    snowy_park_01: { file:'snowy_park_01.jpg', credit:'Poly Haven', license:'CC0', url:'https://polyhaven.com/a/snowy_park_01' },
     earth: { file: 'earth.jpg', credit: 'Solar System Scope', url: 'https://www.solarsystemscope.com/textures/' }
   };
   const defaults = { background:'atacama', brightness:100, rotation:0 };
   let preferences = { ...defaults };
   function validated(value) {
-    return { background:['atacama','galaxy','plain'].includes(value.background) ? value.background : 'atacama',
+    return { background:["atacama","hilly_terrain_01","kloppenheim_03","spruit_sunrise","forest_slope","snowy_park_01"].includes(value.background) ? value.background : 'atacama',
       brightness:Number.isFinite(Number(value.brightness)) ? Math.max(30,Math.min(140,Number(value.brightness))) : 100,
       rotation:Number.isFinite(Number(value.rotation)) ? Math.max(0,Math.min(360,Number(value.rotation))) : 0 };
   }
   try { preferences = validated(JSON.parse(localStorage.getItem('analemma-environment')) || defaults); } catch {}
   const images = {};
-  let pending = Object.keys(sources).length;
+  const initial = new Set([preferences.background,'earth','galaxy']);
+  let pending = initial.size;
   for (const [key, source] of Object.entries(sources)) {
     const img = new Image();
     images[key] = img;
     img.onload = img.onerror = () => {
-      if (!--pending) document.documentElement.dataset.environment = 'ready';
+      if (initial.has(key) && !--pending) document.documentElement.dataset.environment = 'ready';
       root.dispatchEvent(new Event('environmentready'));
     };
-    img.src = 'assets/' + source.file;
+    if(initial.has(key)) img.src = 'assets/' + source.file;
   }
   const vertex = 'attribute vec2 a_position; void main(){gl_Position=vec4(a_position,0.0,1.0);}';
   const fragment = [
@@ -80,11 +86,11 @@
       }
     }
     render(ctx, w, h, projection, camera, orbit = false) {
-      if (preferences.background === 'plain') return false;
       const key = orbit ? 'galaxy' : preferences.background;
       const img = images[key];
+      if(!img.getAttribute('src')) img.src = 'assets/'+sources[key].file;
       if (!img.complete || !img.naturalWidth) return false;
-      const cfg = { ...(orbit || key === 'galaxy' ? { rotate:.08, exposure:orbit ? .24 : .50, top:90, span:180 } : settings) };
+      const cfg = { ...(orbit ? { rotate:.08, exposure:.24, top:90, span:180 } : key === 'atacama' ? settings : { rotate:.5, exposure:1, top:90, span:180 }) };
       cfg.exposure *= preferences.brightness / 100;
       cfg.rotate += preferences.rotation / 360;
       const cache = [key,cfg.exposure,cfg.rotate,w,h,projection.cx,projection.cy,projection.f,camera.az,camera.alt].join(':');
@@ -105,7 +111,14 @@
           if (!texture) {
             texture=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,texture);
             gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,false);
-            gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,img);
+            const limit=Math.min(4096,gl.getParameter(gl.MAX_TEXTURE_SIZE));
+            let textureSource=img;
+            if(Math.max(img.width,img.height)>limit) {
+              const buffer=document.createElement('canvas'), scale=limit/Math.max(img.width,img.height);
+              buffer.width=Math.round(img.width*scale);buffer.height=Math.round(img.height*scale);
+              buffer.getContext('2d').drawImage(img,0,0,buffer.width,buffer.height);textureSource=buffer;
+            }
+            gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,textureSource);
             gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);
             gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);
             gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);
@@ -128,12 +141,13 @@
       return true;
     }
     static updateCredit(view) {
-      const source = preferences.background === 'plain' ? null : sources[view === 'orbit' ? 'galaxy' : preferences.background];
+      const source = sources[view === 'orbit' ? 'galaxy' : preferences.background];
       const el = document.getElementById('photoCredit');
-      if (el) { el.hidden=!source; if(source) { el.href=source.url; el.textContent=source.credit+' · CC BY 4.0'; } }
+      if (el) { el.hidden=!source; if(source) { el.href=source.url; el.textContent=source.credit+' · '+(source.license || 'CC BY 4.0'); } }
       const details = document.getElementById('photoDetails');
       if (details) details.textContent=source ? '사진: '+source.credit+'. 밝기 조정 및 구면 투영을 적용했습니다.' : '단색 하늘과 지평선을 표시합니다.';
     }
+    static get ready() { const image=images[preferences.background];return image.complete && image.naturalWidth>0; }
     static get preferences() { return { ...preferences }; }
     static configure(next) {
       preferences = validated({ ...preferences, ...next });

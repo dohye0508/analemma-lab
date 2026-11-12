@@ -35,7 +35,7 @@
   document.querySelector('.inspector-scroll').prepend($('presets'));
   const renderer = new window.AnalemmaRenderer($('scene'));
   const contextRenderer = new window.AnalemmaRenderer($('contextScene'), { compact: true });
-  const graphRenderer = new window.AnalemmaRenderer($('plotScene'), { plot: true });
+  let previousView = 'sky';
   let frame = 0, dirty = true, previousTime = 0, previousReadout = 0, toastTimeout;
 
   function invalidate() {
@@ -52,11 +52,10 @@
     }
     if (dirty) {
       state.current = P.position(state.params, state.phase);
-      renderer.draw(state);
+      renderer.draw({ ...state, grid:state.view === 'graph' || state.grid });
       if ($('contextScene').checkVisibility({ visibilityProperty: true })) {
         contextRenderer.draw({ ...state, view: state.view === 'sky' ? 'orbit' : 'sky', grid: false, curves: [state.curves[0]] });
       }
-      if (state.analysis) graphRenderer.draw({ ...state, view: 'graph', grid: true });
       if (!state.playing || now - previousReadout > 80) {
         updateReadouts();
         previousReadout = now;
@@ -100,7 +99,6 @@
     for (const key of ['eps', 'ecc', 'peri']) state.params[key] = preset[key];
     $('planetName').textContent = preset.name;
     $('selectedPlanet').className = 'planet ' + preset.id;
-    $('planetDescription').textContent = preset.description;
     document.querySelectorAll('[data-planet]').forEach(button => {
       const active = button.dataset.planet === preset.id;
       button.classList.toggle('active', active);
@@ -121,10 +119,15 @@
     $('currentAz').textContent = p.az.toFixed(2) + '°';
     $('currentEot').textContent = (p.eot >= 0 ? '+' : '') + p.eot.toFixed(2) + '°';
     $('visibilityState').hidden = p.alt >= 0;
-    $('findSun').hidden = state.view !== 'sky' || renderer.sunVisible || (state.analysis && $('analysisPanel').classList.contains('expanded'));
+    $('findSun').hidden = state.view !== 'sky' || renderer.sunVisible;
   }
   function setView(view) {
+    if(view !== 'graph') previousView=view;
     state.view = view;
+    state.analysis = view === 'graph';
+    $('graphToggle').setAttribute('aria-pressed',String(state.analysis));
+    $('graphToggle').setAttribute('aria-label',state.analysis ? '관측으로 돌아가기' : '그래프 보기');
+    $('graphToggle').title=state.analysis ? '관측으로 돌아가기' : '그래프 보기';
     $('viewport').dataset.view = view;
     const label = view === 'sky' ? '궤도 크게 보기' : '관측 크게 보기';
     $('cameraToggle').setAttribute('aria-pressed', String(view === 'orbit'));
@@ -138,18 +141,7 @@
     window.NightEnvironment.updateCredit(view);
     invalidate();
   }
-  function setAnalysis(open) {
-    if (open && window.innerWidth <= 850) togglePanel(false);
-    state.analysis = open;
-    $('analysisPanel').hidden = !open;
-    $('viewport').classList.toggle('analysis-open', open);
-    $('viewport').classList.toggle('analysis-expanded', open && $('analysisPanel').classList.contains('expanded'));
-    $('graphToggle').setAttribute('aria-expanded', String(open));
-    $('graphToggle').setAttribute('aria-label', open ? '그래프 닫기' : '그래프 열기');
-    $('graphToggle').title = open ? '그래프 닫기' : '그래프 열기';
-    if (!open && $('analysisPanel').contains(document.activeElement)) $('graphToggle').focus();
-    invalidate();
-  }
+  function setAnalysis(open) { setView(open ? 'graph' : previousView); }
   function setPlaying(playing) {
     state.playing = playing;
     previousTime = 0;
@@ -170,7 +162,6 @@
   function togglePanel(force) {
     const workspace = document.querySelector('.workspace');
     const hidden = force === undefined ? !workspace.classList.contains('panel-hidden') : !force;
-    if (!hidden && window.innerWidth <= 850 && state.analysis) setAnalysis(false);
     workspace.classList.toggle('panel-hidden', hidden);
     const label = hidden ? '속성 패널 열기' : '속성 패널 숨기기';
     $('panelToggle').setAttribute('aria-expanded', String(!hidden));
@@ -191,13 +182,11 @@
     invalidate();
   }
   function fit() {
-    for (const view of [renderer, contextRenderer, graphRenderer]) view.fit(state);
+    for (const view of [renderer, contextRenderer]) view.fit(state);
     invalidate();
   }
   function zoomActiveSurface(factor) {
-    const graphExpanded = state.analysis && $('analysisPanel').classList.contains('expanded');
-    if (graphExpanded) graphRenderer.zoom('graph', factor);
-    else renderer.zoom(state.view, factor);
+    renderer.zoom(state.view, factor);
     invalidate();
   }
 
@@ -226,19 +215,10 @@
   $('cameraToggle').addEventListener('click', () => setView(state.view === 'sky' ? 'orbit' : 'sky'));
   $('contextSwap').addEventListener('click', () => setView(state.view === 'sky' ? 'orbit' : 'sky'));
   $('graphToggle').addEventListener('click', () => setAnalysis(!state.analysis));
-  $('closeGraph').addEventListener('click', () => setAnalysis(false));
-  $('expandGraph').addEventListener('click', () => {
-    const expanded = $('analysisPanel').classList.toggle('expanded');
-    $('expandGraph').setAttribute('aria-pressed', String(expanded));
-    $('expandGraph').setAttribute('aria-label', expanded ? '그래프 축소' : '그래프 확대');
-    $('expandGraph').title = expanded ? '그래프 축소' : '그래프 확대';
-    $('viewport').classList.toggle('analysis-expanded', expanded);
-    invalidate();
-  });
   $('compareToggle').addEventListener('click', () => {
     state.compare = !state.compare;
     $('compareToggle').setAttribute('aria-pressed', String(state.compare));
-    graphRenderer.graphCamera = { x: 0, y: 0, zoom: 1 };
+    renderer.graphCamera = { x: 0, y: 0, zoom: 1 };
     if (state.compare && state.view === 'orbit') setAnalysis(true);
     rebuild();
   });
@@ -311,13 +291,6 @@
   document.querySelectorAll('[data-background]').forEach(button => button.addEventListener('click', () => { window.NightEnvironment.configure({ background:button.dataset.background }); syncEnvironment(); }));
   for(const [id,key] of [['backgroundBrightness','brightness'],['backgroundRotation','rotation']]) $(id).addEventListener('input', () => { window.NightEnvironment.configure({ [key]:Number($(id).value) }); syncEnvironment(); });
   $('resetEnvironment').addEventListener('click', () => { window.NightEnvironment.reset(); syncEnvironment(); });
-  $('help').addEventListener('click', () => { $('helpDialog').showModal(); });
-  $('closeHelp').addEventListener('click', () => $('helpDialog').close());
-  $('helpDialog').addEventListener('click', event => {
-    if (event.target !== $('helpDialog')) return;
-    const r = $('helpDialog').getBoundingClientRect();
-    if (event.clientX < r.left || event.clientX > r.right || event.clientY < r.top || event.clientY > r.bottom) $('helpDialog').close();
-  });
   $('reset').addEventListener('click', () => {
     setPlaying(false);
     setPhasePopover(false);
@@ -327,10 +300,6 @@
     state.grid = false; state.trail = true;
     $('gridToggle').setAttribute('aria-pressed', 'false');
     $('trailToggle').setAttribute('aria-pressed', 'true');
-    $('analysisPanel').classList.remove('expanded');
-    $('expandGraph').setAttribute('aria-pressed', 'false');
-    $('expandGraph').setAttribute('aria-label', '그래프 확대');
-    $('expandGraph').title = '그래프 확대';
     setAnalysis(false); selectPlanet(earth); setView('sky');
     showToast('초기화했습니다.');
   });
@@ -353,7 +322,7 @@
       if (!previous) return;
       const before = distance();
       pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
-      if (pointers.size === 1) viewRenderer.pan(viewName(), event.clientX - previous.x, event.clientY - previous.y);
+      if (pointers.size === 1) viewRenderer.pan(viewName(), (event.clientX - previous.x) * (viewName() === 'sky' ? -1 : 1), (event.clientY - previous.y) * (viewName() === 'sky' ? -1 : 1));
       else {
         const after = distance();
         if (before > 0 && after > 0) viewRenderer.zoom(viewName(), before / after);
@@ -371,13 +340,12 @@
     canvas.addEventListener('dblclick', () => { viewRenderer.fit(state); invalidate(); });
   }
   attachCamera($('scene'), renderer, () => state.view);
-  attachCamera($('plotScene'), graphRenderer, () => 'graph');
   document.addEventListener('keydown', event => {
-    if (event.ctrlKey || event.metaKey || event.altKey || $('helpDialog').open || $('environmentDialog').open) return;
+    if (event.ctrlKey || event.metaKey || event.altKey || $('environmentDialog').open) return;
     if (event.target.closest('input,select,textarea,[contenteditable="true"]')) return;
     const key = event.key.toLowerCase();
-    const targetRenderer = event.target === $('plotScene') ? graphRenderer : renderer;
-    const targetView = event.target === $('plotScene') ? 'graph' : state.view;
+    const targetRenderer = renderer;
+    const targetView = state.view;
     if (key === ' ') {
       if (event.target.closest('button,a,summary')) return;
       event.preventDefault(); setPlaying(!state.playing);
@@ -388,7 +356,6 @@
     else if (key === 'g') toggleDisplay('grid', 'gridToggle');
     else if (key === 't') toggleDisplay('trail', 'trailToggle');
     else if (key === 'f') fullscreen();
-    else if (key === '?') { $('helpDialog').showModal(); }
     else if (key === '1') setView('sky');
     else if (key === '2') setView('orbit');
     else if (key === '3') setAnalysis(!state.analysis);
@@ -414,11 +381,11 @@
     invalidate();
   });
   inspectorObserver.observe($('inspector'));
-  for (const id of ['viewport', 'contextScene', 'plotScene']) observer.observe($(id));
+  for (const id of ['viewport', 'contextScene']) observer.observe($(id));
   document.fonts.ready.then(invalidate);
   window.addEventListener('environmentready', invalidate);
   togglePanel(window.innerWidth > 850);
   selectPlanet(earth);
   setView('sky');
-  setAnalysis(window.innerWidth > 850);
+
 })();

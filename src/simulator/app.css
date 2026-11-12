@@ -444,3 +444,19 @@ dialog::backdrop { background:#080c12a8; }
 .environment-reset { margin-top:20px;padding:9px 12px;border:1px solid #abc2d237;font-size:13px; }
 @media(min-width:851px) and (max-width:1180px) { .tool-dock .icon-button { width:49px; } }
 @media(max-width:420px) { .environment-body { padding:12px; }.background-preview { height:64px; } }
+
+/* Graph is a main view, never a floating panel. */
+:root:has(.workspace.panel-hidden) { --scene-left:18px; --tools-left:0px; }
+.viewport[data-view=graph] .context-view,.viewport[data-view=graph] .find-sun { display:none!important; }
+.viewport[data-view=graph] .scene-legend { top:96px; left:calc(var(--scene-left) + 66px); gap:18px; }
+.background-choices { grid-template-columns:repeat(3,minmax(0,1fr)); }
+.background-credit { margin-top:16px;border-top:1px solid #abc2d230;padding-top:12px;font-size:12px;color:#9fb2c1; }
+.background-credit summary { cursor:pointer; }
+@media(max-width:700px) {
+ .tool-dock { grid-template-columns:repeat(5,minmax(0,1fr)); }
+ .viewport[data-view=graph] .scene-legend { top:151px;left:58px;right:15px;gap:8px;font-size:11px; }
+ .background-choices { grid-template-columns:repeat(2,minmax(0,1fr)); }
+}
+
+.inspector { background:#10171d; }
+.tool-dock { background:#0b1116f5; }

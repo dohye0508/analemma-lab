@@ -130,6 +130,7 @@
         buckets[Math.min(7,Math.floor(angle/(60*RAD)*8))].push([a,b]);
       }
       c.save();c.strokeStyle=color;c.lineWidth=width;c.lineCap='round';
+      if(root.NightEnvironment.preferences.background !== 'atacama') { c.shadowColor='#0009'; c.shadowBlur=3; }
       c.setLineDash(dashed?[4,5]:[]);
       buckets.forEach((segments,index)=>{c.globalAlpha=1-.22*index/7;c.beginPath();for(const [a,b] of segments){c.moveTo(a.x,a.y);c.lineTo(b.x,b.y);}c.stroke();});
       c.restore();
@@ -284,7 +285,7 @@
     graph() {
       const c=this.ctx,{w,h,state}=this;
       c.fillStyle='#141b24';c.fillRect(0,0,w,h);
-      const margin={left:54,right:w-24,top:26,bottom:h-55};
+      const margin={left:this.left+(w<700?44:66),right:w-(w<700?24:80),top:this.safeTop+(state.compare?74:42),bottom:h-this.safeBottom-58};
       const width=Math.max(50,margin.right-margin.left),height=Math.max(80,margin.bottom-margin.top);
       const mainAz=P.unwrap(state.curves[0].points.map(p=>p.az));
       const mainCenter=mainAz.reduce((a,b)=>a+b,0)/mainAz.length;
@@ -299,17 +300,18 @@
       const minY=Math.min(...all.map(p=>p.alt)), maxY=Math.max(...all.map(p=>p.alt));
       const yPadding=Math.max((maxY-minY)*0.09,3);
       const naturalYLow=Math.max(-90,minY-yPadding),naturalYHigh=Math.min(90,maxY+yPadding);
-      const spanX=Math.max(maxX-minX,6)*1.18/this.graphCamera.zoom,spanY=(naturalYHigh-naturalYLow)/this.graphCamera.zoom;
+      const unitsPerPixel=Math.max(Math.max(maxX-minX,6)*1.18/width,Math.max(naturalYHigh-naturalYLow,6)/height);
+      const spanX=unitsPerPixel*width/this.graphCamera.zoom,spanY=unitsPerPixel*height/this.graphCamera.zoom;
       const centerX=(minX+maxX)/2-this.graphCamera.x/width*spanX,centerY=(naturalYLow+naturalYHigh)/2+this.graphCamera.y/height*spanY;
       const xLow=centerX-spanX/2,yLow=centerY-spanY/2;
       const project=p=>({x:margin.left+(p.x-xLow)/spanX*width,y:margin.bottom-(p.alt-yLow)/spanY*height});
-      const stepFor=span=>{const rough=span/(w<500?3:5),power=10**Math.floor(Math.log10(rough));return [1,2,5,10].find(n=>n*power>=rough)*power;};
-      const xStep=stepFor(spanX),yStep=stepFor(spanY);
+      const stepFor=(span,pixels,spacing)=>{const rough=span/Math.max(3,Math.floor(pixels/spacing)),power=10**Math.floor(Math.log10(rough));return [1,2,5,10].find(n=>n*power>=rough)*power;};
+      const xStep=stepFor(spanX,width,95),yStep=stepFor(spanY,height,64);
       if(state.grid){
-        for(let x=Math.ceil(xLow/xStep)*xStep;x<=xLow+spanX;x+=xStep){const q=project({x,alt:0});this.line([{x:q.x,y:margin.top},{x:q.x,y:margin.bottom}],p=>p,'#7591ac26');this.label(`${Math.round(((x%360)+360)%360)}°`,q.x,margin.bottom+22,'#a4b5ca','center','13px Pretendard, sans-serif');}
+        for(let x=Math.ceil(xLow/xStep)*xStep;x<=xLow+spanX;x+=xStep){const q=project({x,alt:0});this.line([{x:q.x,y:margin.top},{x:q.x,y:margin.bottom}],p=>p,'#7591ac26');this.label(`${Number((((x%360)+360)%360).toFixed(Math.max(0,-Math.floor(Math.log10(xStep)))))}°`,q.x,margin.bottom+22,'#a4b5ca','center','13px Pretendard, sans-serif');}
         for(let y=Math.ceil(yLow/yStep)*yStep;y<=yLow+spanY;y+=yStep){const q=project({x:0,alt:y});this.line([{x:margin.left,y:q.y},{x:margin.right,y:q.y}],p=>p,'#7591ac26');this.label(`${y.toFixed(yStep<1?1:0)}°`,margin.left-10,q.y+4,'#a4b5ca','right','13px Pretendard, sans-serif');}
       }
-      this.label('고도',margin.left,margin.top-11,'#b9c8db');this.label('방위각',margin.right,margin.bottom+46,'#b9c8db','right');
+      this.label('고도 (°)',margin.left,margin.top-20,'#b9c8db');this.label('방위각 (°)',(margin.left+margin.right)/2,margin.bottom+48,'#b9c8db','center');
       c.save();c.beginPath();c.rect(margin.left,margin.top,width,height);c.clip();
       const horizon=project({x:0,alt:0}).y;
       if(horizon<margin.bottom){c.fillStyle='#574b3822';c.fillRect(margin.left,Math.max(horizon,margin.top),width,height);this.line([{x:margin.left,y:horizon},{x:margin.right,y:horizon}],p=>p,'#b39b6b66',1,true);}

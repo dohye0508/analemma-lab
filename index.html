@@ -50,11 +50,7 @@
         <button class="context-view" id="contextSwap" aria-label="궤도 크게 보기" title="궤도 크게 보기">
           <canvas id="contextScene" aria-hidden="true"></canvas><span class="context-label" id="contextLabel">공전 궤도</span><span class="swap-mark"><svg class="icon" aria-hidden="true"><use href="#i-swap"/></svg></span>
         </button>
-        <section class="analysis-panel" id="analysisPanel" aria-label="아날렘마 그래프" hidden>
-          <header><span>아날렘마</span><div><button id="expandGraph" class="icon-button" aria-label="그래프 확대" title="그래프 확대" aria-pressed="false"><svg class="icon" aria-hidden="true"><use href="#i-expand"/></svg></button><button id="closeGraph" class="icon-button" aria-label="그래프 닫기" title="그래프 닫기" ><svg class="icon" aria-hidden="true"><use href="#i-close"/></svg></button></div></header>
-          <canvas id="plotScene" tabindex="0" aria-label="방위각–고도 그래프. 드래그로 이동, 휠·핀치로 확대. 더블 클릭으로 초기 시점."></canvas>
-        </section>
-        <div class="scene-legend" id="legend" aria-label="위도 범례" hidden></div>
+<div class="scene-legend" id="legend" aria-label="위도 범례" hidden></div>
         <button id="findSun" class="find-sun" hidden><svg class="icon" aria-hidden="true"><use href="#i-sun"/></svg><span>태양 찾기</span></button>
       </section>
       <aside class="inspector" id="inspector" aria-label="행성 속성">
@@ -77,7 +73,7 @@
       <nav class="tool-dock" aria-label="화면 도구">
         <div class="tool-group">
           <button id="cameraToggle" class="icon-button" aria-label="궤도 크게 보기" title="궤도 크게 보기" aria-pressed="false"><svg class="icon" aria-hidden="true"><use href="#i-orbit"/></svg><span class="tool-label">궤도</span></button>
-          <button id="graphToggle" class="icon-button" aria-label="그래프 열기 (3)" title="그래프 열기 (3)" aria-expanded="false" aria-controls="analysisPanel"><svg class="icon" aria-hidden="true"><use href="#i-chart"/></svg><span class="tool-label">그래프</span></button>
+          <button id="graphToggle" class="icon-button" aria-label="그래프 열기 (3)" title="그래프 열기 (3)" aria-pressed="false"><svg class="icon" aria-hidden="true"><use href="#i-chart"/></svg><span class="tool-label">그래프</span></button>
           <button id="compareToggle" class="icon-button" aria-label="위도 비교: 0°, 30°N, 60°N, 89°N" title="위도 비교: 0°, 30°N, 60°N, 89°N" aria-pressed="false"><svg class="icon" aria-hidden="true"><use href="#i-compare"/></svg><span class="tool-label">위도 비교</span></button>
         </div>
         <div class="tool-group">
@@ -89,7 +85,6 @@
           <button id="reset" class="icon-button" aria-label="시뮬레이션 초기화" title="시뮬레이션 초기화" ><svg class="icon" aria-hidden="true"><use href="#i-reset"/></svg><span class="tool-label">초기화</span></button>
           <button id="fullscreen" class="icon-button" aria-label="전체 화면 (F)" title="전체 화면 (F)" aria-pressed="false"><svg class="icon" aria-hidden="true"><use href="#i-expand"/></svg><span class="tool-label">전체 화면</span></button>
 <button id="environmentToggle" class="icon-button" aria-label="배경 설정" title="배경 설정" aria-haspopup="dialog"><svg class="icon" aria-hidden="true"><use href="#i-sky"/></svg><span class="tool-label">배경</span></button>
-          <button id="help" class="icon-button" aria-label="도움말 (?)" title="도움말 (?)" ><svg class="icon" aria-hidden="true"><use href="#i-help"/></svg><span class="tool-label">도움말</span></button>
           <button id="panelToggle" class="icon-button" aria-label="속성 패널 숨기기" title="속성 패널 숨기기" aria-expanded="true" aria-controls="inspector"><svg class="icon" aria-hidden="true"><use href="#i-settings"/></svg><span class="tool-label">속성</span></button>
         </div>
       </nav>
@@ -104,23 +99,15 @@
     <header class="dialog-heading"><h2 id="environmentTitle">배경</h2><button id="closeEnvironment" class="icon-button" aria-label="배경 설정 닫기"><svg class="icon" aria-hidden="true"><use href="#i-close"/></svg></button></header>
     <div class="environment-body"><div class="background-choices" role="group" aria-label="관측 배경">
       <button data-background="atacama" aria-pressed="true"><span class="background-preview desert"></span><span>아타카마</span></button>
-      <button data-background="galaxy" aria-pressed="false"><span class="background-preview galaxy"></span><span>은하수</span></button>
-      <button data-background="plain" aria-pressed="false"><span class="background-preview plain"></span><span>단색</span></button>
+<button data-background="hilly_terrain_01" aria-pressed="false"><span class="background-preview" style="background-image:url('assets/hilly_terrain_01.jpg')"></span><span>언덕</span></button>
+<button data-background="kloppenheim_03" aria-pressed="false"><span class="background-preview" style="background-image:url('assets/kloppenheim_03.jpg')"></span><span>초원</span></button>
+<button data-background="spruit_sunrise" aria-pressed="false"><span class="background-preview" style="background-image:url('assets/spruit_sunrise.jpg')"></span><span>일출</span></button>
+<button data-background="forest_slope" aria-pressed="false"><span class="background-preview" style="background-image:url('assets/forest_slope.jpg')"></span><span>숲</span></button>
+<button data-background="snowy_park_01" aria-pressed="false"><span class="background-preview" style="background-image:url('assets/snowy_park_01.jpg')"></span><span>설원</span></button>
     </div><div class="environment-setting"><label for="backgroundBrightness">밝기</label><output id="brightnessValue">100%</output><input id="backgroundBrightness" type="range" min="30" max="140" step="1" value="100"></div>
     <div class="environment-setting"><label for="backgroundRotation">방향</label><output id="rotationValue">0°</output><input id="backgroundRotation" type="range" min="0" max="360" step="1" value="0"></div>
-    <button id="resetEnvironment" class="environment-reset">배경 기본값</button></div>
+    <button id="resetEnvironment" class="environment-reset">배경 기본값</button><details class="background-credit"><summary>사진 출처</summary><a class="photo-source" id="photoCredit" href="https://www.eso.org/public/images/uhd_img2563pv2_cc_eq/" target="_blank" rel="noopener">ESO/B. Tafreshi · CC BY 4.0</a><p id="photoDetails"></p><p>지구 표면: Solar System Scope · CC BY 4.0</p><p>사진은 관측 배경이며 현재 위도·시간의 실제 하늘을 계산한 것은 아닙니다.</p></details></div>
   </dialog>
-  <dialog id="helpDialog" aria-labelledby="helpTitle">
-    <header class="dialog-heading"><h2 id="helpTitle">사용법</h2><button id="closeHelp" class="icon-button" aria-label="도움말 닫기" title="도움말 닫기" ><svg class="icon" aria-hidden="true"><use href="#i-close"/></svg></button></header>
-    <div class="dialog-body">
-      <p>같은 장소, 같은 평균태양시 정오의 태양을 한 공전 동안 관측합니다.</p>
-      <dl class="shortcut-list"><div><dt>드래그 · 화살표</dt><dd>시점 이동</dd></div><div><dt>휠 · 핀치 · + / −</dt><dd>확대·축소</dd></div><div><dt>Space</dt><dd>재생·정지</dd></div><div><dt>공전 % 클릭</dt><dd>위치 이동·직접 입력</dd></div><div><dt>R</dt><dd>시점 맞춤</dd></div><div><dt>1 / 2 / 3</dt><dd>관측 / 궤도 / 그래프 펼치기</dd></div><div><dt>G / T / F</dt><dd>격자 / 궤적 / 전체 화면</dd></div></dl>
-      <details><summary>선택한 행성</summary><p id="planetDescription"></p></details>
-      <details><summary>배경·사진 출처</summary><p>ESO에서 촬영한 파노라마를 관측 장면으로 사용합니다. 별과 지형은 배경 사진이며 현재 위도나 시간의 실제 별자리 계산은 아닙니다. 태양 궤적은 기존 평균태양시 정오 모델을 그대로 사용합니다. 궤적은 현재 태양에서 각도상 멀어질수록 최대 22% 옅어지며, 작은 점은 공전 25% 간격입니다.</p><p id="photoDetails"></p><a class="photo-source" id="photoCredit" href="https://www.eso.org/public/images/uhd_img2563pv2_cc_eq/" target="_blank" rel="noopener">ESO/B. Tafreshi · CC BY 4.0</a><p>지구 표면: <a href="https://www.solarsystemscope.com/textures/" target="_blank" rel="noopener">Solar System Scope</a> · CC BY 4.0</p></details>
-      <details><summary>계산과 단위</summary><p>공전 0%는 근일점, 50%는 원일점입니다. 실제 달력 날짜나 하루 동안의 운동을 뜻하지 않습니다. 재생 속도 1×에서 한 공전은 20초입니다.</p><p>케플러 방정식 M = E − e sin E로 태양의 적위·균시차·방위각·고도를 계산합니다. 균시차 단위는 각도(°), 근일점 방향은 기존 모델의 태양 황경 기준입니다. 위도는 극점의 방위각 특이점을 피해 ±89°까지 계산합니다.</p><p>궤도 거리의 기준은 긴반지름 a이며 천체 크기는 확대했습니다. 대기 굴절, 실제 지형, 자전·공전 공명은 포함하지 않습니다. 지평선 아래 궤적은 점선입니다.</p></details>
-      <a href="https://github.com/dohye0508/analemma-lab" target="_blank" rel="noopener noreferrer">소스 코드 ↗</a>
-    </div>
-  </dialog>
-  <div class="toast" id="toast" role="status" hidden></div>
+<div class="toast" id="toast" role="status" hidden></div>
 </body>
 </html>
