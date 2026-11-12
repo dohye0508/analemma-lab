@@ -322,7 +322,10 @@
       if (!previous) return;
       const before = distance();
       pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
-      if (pointers.size === 1) viewRenderer.pan(viewName(), event.clientX - previous.x, event.clientY - previous.y);
+      if (pointers.size === 1) {
+        const direction = viewName() === 'orbit' ? -1 : 1;
+        viewRenderer.pan(viewName(), (event.clientX - previous.x) * direction, (event.clientY - previous.y) * direction);
+      }
       else {
         const after = distance();
         if (before > 0 && after > 0) viewRenderer.zoom(viewName(), before / after);
