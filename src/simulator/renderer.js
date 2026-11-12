@@ -15,16 +15,13 @@
   }
 
   class Renderer {
-    constructor(canvas, inset) {
+    constructor(canvas, options = {}) {
       this.canvas = canvas; this.ctx = canvas.getContext('2d');
-      this.inset = inset; this.insetCtx = inset.getContext('2d');
+      this.compact = Boolean(options.compact);
+      this.plot = Boolean(options.plot);
       this.camera = { az: 180, alt: 43, fov: 90 };
       this.orbitCamera = { yaw: -0.38, pitch: 0.52, zoom: 1 };
       this.graphCamera = { x: 0, y: 0, zoom: 1 };
-      // Decorative sky references are deterministic and do not represent a star catalog.
-      let seed = 5927;
-      const random = () => ((seed = (seed * 16807) % 2147483647) - 1) / 2147483646;
-      this.stars = Array.from({ length: 180 }, () => ({ ...direction(random() * 360, Math.asin(random()) / RAD), size: random() * 0.7 + 0.25 }));
     }
 
     size(canvas, ctx) {
@@ -56,6 +53,12 @@
       if (view === 'graph') this.graphCamera.zoom = clamp(this.graphCamera.zoom / factor, 0.4, 12);
     }
 
+    focusSun(state) {
+      const sun = P.position(state.params, state.phase);
+      this.camera.az = sun.az;
+      this.camera.alt = clamp(sun.alt, -80, 85);
+    }
+
     pan(view, dx, dy) {
       if (view === 'sky') {
         this.camera.az -= dx * this.camera.fov / Math.max(this.w, 300);
@@ -73,13 +76,13 @@
       this.state = state;
       this.ctx.clearRect(0, 0, this.w, this.h);
       this.ctx.lineWidth = 1; this.ctx.setLineDash([]);
-      this.ctx.font = '11px KoPub, sans-serif';
-      this.left = this.w < 500 ? 147 : this.w < 850 ? 180 : 205;
-      this.right = this.w - 62;
+      this.ctx.font = '14px Pretendard, sans-serif';
+      this.left = this.compact || this.plot ? 0 : root.innerWidth <= 600 ? 16 : 104;
+      this.right = this.w - (this.compact || this.plot ? 0 : 24);
+      this.safeTop = this.compact ? 8 : root.innerWidth <= 600 ? 106 : 32;
       if (state.view === 'sky') this.sky();
       else if (state.view === 'orbit') this.orbit();
       else this.graph();
-      if (this.inset.getBoundingClientRect().width > 0 && state.view !== 'orbit') this.drawInset();
     }
 
     skyProjection() {
@@ -87,8 +90,9 @@
       const forward = direction(az, alt);
       const right = { x: Math.cos(az * RAD), y: 0, z: -Math.sin(az * RAD) };
       const up = { x: -Math.sin(az * RAD) * Math.sin(alt * RAD), y: Math.cos(alt * RAD), z: -Math.cos(az * RAD) * Math.sin(alt * RAD) };
-      const f = Math.min(this.h * 0.92, (this.right - this.left) * 2) / (2 * Math.tan(fov * RAD / 2));
-      const cx = (this.left + this.right) / 2, cy = this.h * 0.54;
+      const availableHeight = Math.max(90, this.h - this.safeTop);
+      const f = Math.min(availableHeight * 0.9, (this.right - this.left) * 2) / (2 * Math.tan(fov * RAD / 2));
+      const cx = (this.left + this.right) / 2, cy = this.safeTop + availableHeight * 0.5;
       const projectVector = v => {
         const z = dot(v, forward);
         if (z < 0.09) return null;
@@ -111,7 +115,7 @@
       c.stroke(); c.setLineDash([]);
     }
 
-    label(text, x, y, color = '#8294a6', align = 'left', font = '10px KoPub, sans-serif') {
+    label(text, x, y, color = '#a0b0c3', align = 'left', font = '14px Pretendard, sans-serif') {
       const c = this.ctx;
       c.font = font; c.textAlign = align; c.fillStyle = color; c.fillText(text, x, y); c.textAlign = 'left';
     }
@@ -128,18 +132,12 @@
         ground.addColorStop(0, '#1a2427'); ground.addColorStop(1, '#11181b');
         c.fillStyle = ground; c.fillRect(0, Math.max(0, horizon), w, h);
       }
-      c.save(); c.globalAlpha = 0.22;
-      for (const star of this.stars) {
-        const q = projection.projectVector(star);
-        if (q && q.x > 0 && q.x < w && q.y > 0 && q.y < Math.min(horizon, h)) circle(c, q.x, q.y, star.size, '#bccbd7');
-      }
-      c.restore();
       if (state.grid) {
         for (let alt = -60; alt <= 75; alt += 15) {
           const points = Array.from({ length: 361 }, (_, az) => ({ az, alt }));
           this.line(points, p => projection.project(p.az, p.alt), alt === 0 ? '#8399a455' : '#8099b11e');
           const q = projection.project(this.camera.az + 35, alt);
-          if (q && q.y > 155 && q.y < h - 38 && q.x < w - 64) this.label(`${alt}°`, q.x + 4, q.y - 6, '#93a6b066');
+          if (!this.compact && alt % 30 === 0 && q && q.y > this.safeTop && q.y < h - 38 && q.x < w - 40) this.label(`${alt}°`, q.x + 4, q.y - 9, '#97adbd');
         }
         for (let az = 0; az < 360; az += 30) {
           const points = Array.from({ length: 175 }, (_, i) => ({ az, alt: -85 + i }));
@@ -148,46 +146,32 @@
       }
       if (horizon > 0 && horizon < h) {
         c.strokeStyle = '#91a0a14a'; c.beginPath(); c.moveTo(0, horizon); c.lineTo(w, horizon); c.stroke();
-        this.label('지평선 · 0°', w - 22, horizon - 10, '#94a3a3', 'right');
       }
       for (const [az, name] of [[0, 'N'], [90, 'E'], [180, 'S'], [270, 'W']]) {
         const q = projection.project(az, 0);
-        if (q && q.x > 30 && q.x < w - 30 && q.y > 0 && q.y < h - 25) this.label(name, q.x, q.y + 22, '#c1ccc9', 'center', '12px Arial, sans-serif');
+        if (!this.compact && q && q.x > 30 && q.x < w - 30 && q.y > this.safeTop && q.y < h - 25) this.label(name, q.x, q.y + 25, '#bdc9d3', 'center', '16px Pretendard, sans-serif');
       }
       if (state.trail) {
         [...state.curves].reverse().forEach(curve => {
           const points = curve.points.concat(curve.points[0]);
-          this.line(points, p => p.alt >= 0 ? projection.project(p.az, p.alt) : null, curve.color, curve.main ? 1.7 : 1, !curve.main);
-          this.line(points, p => p.alt < 0 ? projection.project(p.az, p.alt) : null, curve.color + '88', 1, true);
-          if (curve.main) {
-            for (let j = 0; j < curve.points.length; j += 30) {
-              const q = projection.project(curve.points[j].az, curve.points[j].alt);
-              if (q) circle(c, q.x, q.y, 1.7, '#f0c98b');
-            }
-            for (let j = 0; j < 4; j++) {
-              const p = curve.points[j * curve.points.length / 4], q = projection.project(p.az, p.alt);
-              if (q && q.x > this.left && q.x < this.right - 20 && q.y > 145 && q.y < h - 85) this.label(`${j * 25}%`, q.x - 10, q.y - 8, '#c3b59b99', 'right', '9px Consolas, monospace');
-            }
-          }
+          const width = this.compact ? 1.4 : curve.main ? 2.5 : 1.6;
+          this.line(points, p => p.alt >= 0 ? projection.project(p.az, p.alt) : null, curve.color, width, !curve.main);
+          this.line(points, p => p.alt < 0 ? projection.project(p.az, p.alt) : null, curve.color + 'aa', width, true);
         });
       }
       const sun = projection.project(state.current.az, state.current.alt);
-      this.sunVisible = !!sun && sun.x > this.left && sun.x < this.right && sun.y > 135 && sun.y < h - 30;
-      if (sun) this.sun(sun.x, sun.y, state.current.alt < 0, true);
+      this.sunVisible = !!sun && sun.x > this.left && sun.x < this.right && sun.y > this.safeTop && sun.y < h - 30;
+      if (sun) this.sun(sun.x, sun.y, state.current.alt < 0);
     }
 
-    sun(x, y, below = false, label = false) {
+    sun(x, y, below = false) {
       const c = this.ctx;
-      const halo = c.createRadialGradient(x, y, 2, x, y, 44);
+      const radius = this.compact ? 20 : 45;
+      const halo = c.createRadialGradient(x, y, 2, x, y, radius);
       halo.addColorStop(0, below ? '#e7b66d28' : '#f6d9a159'); halo.addColorStop(0.25, '#e7b66d15'); halo.addColorStop(1, '#e7b66d00');
-      c.fillStyle = halo; c.fillRect(x - 44, y - 44, 88, 88);
-      circle(c, x, y, below ? 3.5 : 5.5, below ? GOLD : '#fff0cc');
-      circle(c, x, y, 10, null, '#e7b66d55');
-      if (label && x > this.left && x < this.right - 68 && y > 135 && y < this.h - 55) {
-        c.strokeStyle = '#c7c2b374'; c.beginPath(); c.moveTo(x + 13, y - 4); c.lineTo(x + 30, y - 21); c.lineTo(x + 71, y - 21); c.stroke();
-        this.label('태양', x + 33, y - 28, '#e6d7b8', 'left', '11px KoPub, sans-serif');
-        this.label(`${this.state.current.alt.toFixed(2)}°`, x + 33, y - 7, '#a6b1bc', 'left', '10px Consolas, monospace');
-      }
+      c.fillStyle = halo; c.fillRect(x - radius, y - radius, radius * 2, radius * 2);
+      circle(c, x, y, this.compact ? 3 : below ? 5 : 8, below ? GOLD : '#fff0cc');
+      circle(c, x, y, this.compact ? 6 : 13, null, '#e7b66d55');
     }
 
     orbitalPoint(point) {
@@ -214,37 +198,35 @@
       }
       const points = state.curves[0].points.map(p => this.orbitalPoint(p));
       if (state.trail) {
-        this.line(points.concat(points[0]), project, '#7184986b', 1.2);
-        for (let i = 0; i < points.length; i += 30) { const q = project(points[i]); circle(c, q.x, q.y, 1.3, '#8c9eaf88'); }
+        this.line(points.concat(points[0]), project, '#8fa2bba0', this.compact ? 1.3 : 1.8);
         const end = Math.floor(state.phase * points.length);
         this.line(points.slice(0, end + 1), project, '#d5b07a90', 1.5);
       }
       const planetPosition = this.orbitalPoint(state.current), q = project(planetPosition), s = project({ x: 0, y: 0, z: 0 });
       this.line([{ x: 0, y: 0, z: 0 }, planetPosition], project, '#d3ab6c50', 1, true);
-      const glow = c.createRadialGradient(s.x, s.y, 3, s.x, s.y, 92);
+      const sunRadius = this.compact ? 8 : 25;
+      const glowRadius = this.compact ? 34 : 100;
+      const glow = c.createRadialGradient(s.x, s.y, 3, s.x, s.y, glowRadius);
       glow.addColorStop(0, '#f5bc6666'); glow.addColorStop(0.4, '#edaf5120'); glow.addColorStop(1, '#edaf5100');
-      c.fillStyle = glow; c.fillRect(s.x - 92, s.y - 92, 184, 184);
-      const sun = c.createRadialGradient(s.x - 5, s.y - 5, 0, s.x, s.y, 19);
+      c.fillStyle = glow; c.fillRect(s.x - glowRadius, s.y - glowRadius, glowRadius * 2, glowRadius * 2);
+      const sun = c.createRadialGradient(s.x - sunRadius / 4, s.y - sunRadius / 4, 0, s.x, s.y, sunRadius);
       sun.addColorStop(0, '#fff4d4'); sun.addColorStop(0.75, '#f1cb83'); sun.addColorStop(1, '#bd843c');
-      circle(c, s.x, s.y, 19, sun);
-      this.label('태양', s.x, s.y + 38, '#c1ab88', 'center');
-      const r = this.w < 500 ? 13 : 22;
+      circle(c, s.x, s.y, sunRadius, sun);
+      const r = this.compact ? 9 : this.w < 500 ? 20 : 28;
       this.planet(c, q.x, q.y, r, state.preset, s.x - q.x, s.y - q.y);
       // The axis is fixed in inertial space; axial tilt affects both this and the sky model.
       const axis = { x: 0, y: Math.cos(state.params.eps * RAD), z: Math.sin(state.params.eps * RAD) };
       const projectedAxis = project({ x: planetPosition.x + axis.x, y: axis.y, z: planetPosition.z + axis.z });
       const length = Math.hypot(projectedAxis.x - q.x, projectedAxis.y - q.y) || 1;
-      const dx = (projectedAxis.x - q.x) / length * (r + 22), dy = (projectedAxis.y - q.y) / length * (r + 22);
+      const axisLength = r + (this.compact ? 9 : 28);
+      const dx = (projectedAxis.x - q.x) / length * axisLength, dy = (projectedAxis.y - q.y) / length * axisLength;
       c.strokeStyle = '#a4c4db99'; c.setLineDash([3, 3]); c.beginPath(); c.moveTo(q.x - dx, q.y - dy); c.lineTo(q.x + dx, q.y + dy); c.stroke(); c.setLineDash([]);
-      this.label('N', q.x + dx + 5, q.y + dy - 4, '#aac5d5', 'left', '9px Arial, sans-serif');
-      this.label(state.preset.name, q.x + r + 13, q.y - 4, '#d7e0e7', 'left', '13px KoPub, sans-serif');
-      this.label(`ε ${state.params.eps.toFixed(2)}°`, q.x + r + 13, q.y + 13, '#7f94a8', 'left', '10px Consolas, monospace');
-      for (const [phase, text] of [[0, '근일점'], [0.5, '원일점']]) {
+      if (!this.compact) this.label('N', q.x + dx + 6, q.y + dy - 4, '#b7cddd', 'left', '14px Pretendard, sans-serif');
+      if (state.grid && !this.compact) for (const [phase, text] of [[0, '근일점'], [0.5, '원일점']]) {
         const p = project(this.orbitalPoint(P.position(state.params, phase)));
         circle(c, p.x, p.y, 3, '#0b1017', '#667c92');
         this.label(text, p.x, p.y + 20, '#8393a5', 'center');
       }
-      this.label('공전면', this.right - 12, h - 78, '#586b7d', 'right');
       this.sunVisible = true;
     }
 
@@ -268,22 +250,10 @@
       circle(c,x,y,r,null,'#a4c9e033');
     }
 
-    drawInset() {
-      const c = this.insetCtx, {w,h} = this.size(this.inset,c), state = this.state;
-      c.clearRect(0,0,w,h);
-      const scale = w * 0.34 / (1 + state.params.ecc), cx=w*.5, cy=h*.51;
-      const project = p => {const q=this.orbitalPoint(p);return {x:cx+q.x*scale,y:cy+q.z*scale*.58};};
-      c.beginPath();state.curves[0].points.forEach((p,i)=>{const q=project(p);i?c.lineTo(q.x,q.y):c.moveTo(q.x,q.y);});c.closePath();c.strokeStyle='#5e708255';c.stroke();
-      const q=project(state.current);
-      c.beginPath();c.moveTo(cx,cy);c.lineTo(q.x,q.y);c.strokeStyle='#d6b7843a';c.stroke();
-      circle(c,cx,cy,4,'#e7c389');circle(c,q.x,q.y,4,state.preset.color);circle(c,q.x,q.y,7,null,'#adc8da44');
-    }
-
     graph() {
       const c=this.ctx,{w,h,state}=this;
-      c.fillStyle='#10171f';c.fillRect(0,0,w,h);
-      const margin={left:this.left+20,right:w-72,top:this.w<500?210:175,bottom:h-87};
-      if(margin.bottom-margin.top<60)margin.top=145;
+      c.fillStyle='#141b24';c.fillRect(0,0,w,h);
+      const margin={left:54,right:w-24,top:26,bottom:h-55};
       const width=Math.max(50,margin.right-margin.left),height=Math.max(80,margin.bottom-margin.top);
       const mainAz=P.unwrap(state.curves[0].points.map(p=>p.az));
       const mainCenter=mainAz.reduce((a,b)=>a+b,0)/mainAz.length;
@@ -302,19 +272,19 @@
       const centerX=(minX+maxX)/2-this.graphCamera.x/width*spanX,centerY=(naturalYLow+naturalYHigh)/2+this.graphCamera.y/height*spanY;
       const xLow=centerX-spanX/2,yLow=centerY-spanY/2;
       const project=p=>({x:margin.left+(p.x-xLow)/spanX*width,y:margin.bottom-(p.alt-yLow)/spanY*height});
-      const stepFor=span=>{const rough=span/5,power=10**Math.floor(Math.log10(rough));return [1,2,5,10].find(n=>n*power>=rough)*power;};
+      const stepFor=span=>{const rough=span/(w<500?3:5),power=10**Math.floor(Math.log10(rough));return [1,2,5,10].find(n=>n*power>=rough)*power;};
       const xStep=stepFor(spanX),yStep=stepFor(spanY);
       if(state.grid){
-        for(let x=Math.ceil(xLow/xStep)*xStep;x<=xLow+spanX;x+=xStep){const q=project({x,alt:0});this.line([{x:q.x,y:margin.top},{x:q.x,y:margin.bottom}],p=>p,'#7591ac1a');this.label(`${Math.round(((x%360)+360)%360)}°`,q.x,margin.bottom+20,'#8295a9','center','10px Consolas, monospace');}
-        for(let y=Math.ceil(yLow/yStep)*yStep;y<=yLow+spanY;y+=yStep){const q=project({x:0,alt:y});this.line([{x:margin.left,y:q.y},{x:margin.right,y:q.y}],p=>p,'#7591ac1a');this.label(`${y.toFixed(yStep<1?1:0)}°`,margin.left-10,q.y+3,'#8295a9','right','10px Consolas, monospace');}
+        for(let x=Math.ceil(xLow/xStep)*xStep;x<=xLow+spanX;x+=xStep){const q=project({x,alt:0});this.line([{x:q.x,y:margin.top},{x:q.x,y:margin.bottom}],p=>p,'#7591ac26');this.label(`${Math.round(((x%360)+360)%360)}°`,q.x,margin.bottom+22,'#a4b5ca','center','13px Pretendard, sans-serif');}
+        for(let y=Math.ceil(yLow/yStep)*yStep;y<=yLow+spanY;y+=yStep){const q=project({x:0,alt:y});this.line([{x:margin.left,y:q.y},{x:margin.right,y:q.y}],p=>p,'#7591ac26');this.label(`${y.toFixed(yStep<1?1:0)}°`,margin.left-10,q.y+4,'#a4b5ca','right','13px Pretendard, sans-serif');}
       }
-      this.label('고도',margin.left,margin.top-16,'#9bafc0');this.label('방위각 (북 = 0°)',margin.right,margin.bottom+39,'#9bafc0','right');
+      this.label('고도',margin.left,margin.top-11,'#b9c8db');this.label('방위각',margin.right,margin.bottom+46,'#b9c8db','right');
       c.save();c.beginPath();c.rect(margin.left,margin.top,width,height);c.clip();
       const horizon=project({x:0,alt:0}).y;
       if(horizon<margin.bottom){c.fillStyle='#574b3822';c.fillRect(margin.left,Math.max(horizon,margin.top),width,height);this.line([{x:margin.left,y:horizon},{x:margin.right,y:horizon}],p=>p,'#b39b6b66',1,true);}
       if(state.trail) [...series].reverse().forEach(s=>{
         const points = Math.abs(s.points[0].x-s.points.at(-1).x)<180 ? s.points.concat(s.points[0]) : s.points;
-        this.line(points,project,s.color,s.main?1.8:1,!s.main);
+        this.line(points,project,s.color,s.main?2.2:1.5,!s.main);
       });
       const sampleIndex=Math.min(mainAz.length-1,Math.floor((state.phase%1)*mainAz.length));
       const currentX=state.current.az+Math.round((mainAz[sampleIndex]-state.current.az)/360)*360;

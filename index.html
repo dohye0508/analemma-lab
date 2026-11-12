@@ -3,10 +3,11 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#15181c">
+  <meta name="theme-color" content="#171717">
   <meta name="description" content="행성의 궤도와 자전축을 조정하고, 1년 동안 태양이 그리는 아날렘마를 관측하는 시뮬레이터.">
-  <title>Analemma Lab — 아날렘마 시뮬레이터</title>
+  <title>아날렘마 시뮬레이션</title>
   <link rel="icon" href="data/icon.jpg">
+  <link rel="preload" href="fonts/pretendard/PretendardVariable.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="src/simulator/app.css">
   <script src="src/simulator/physics.js" defer></script>
   <script src="src/simulator/renderer.js" defer></script>
@@ -27,65 +28,85 @@
     <symbol id="i-next" viewBox="0 0 24 24"><path d="M18 5v14M6 5l10 7-10 7Z"/></symbol>
     <symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol>
     <symbol id="i-grid" viewBox="0 0 24 24"><path d="M4 4h16v16H4ZM4 9h16M4 15h16M9 4v16m6-16v16"/></symbol>
-    <symbol id="i-trail" viewBox="0 0 24 24"><path d="M9 12C-1 2 25 2 15 12S-1 22 9 12Z"/></symbol>
+    <symbol id="i-trail" viewBox="0 0 24 24"><path d="M12 12C5 6 7 3 12 3s7 3 0 9-10 9 0 9 7-3 0-9Z"/></symbol>
+    <symbol id="i-settings" viewBox="0 0 24 24"><path d="M4 7h16M4 17h16"/><circle cx="9" cy="7" r="3" fill="var(--panel)"/><circle cx="15" cy="17" r="3" fill="var(--panel)"/></symbol>
+    <symbol id="i-compare" viewBox="0 0 24 24"><path d="M4 4v16M20 4v16M8 8h8m-3-3 3 3-3 3M16 16H8m3-3-3 3 3 3"/></symbol>
+    <symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9 9a3 3 0 1 1 5 2c-1 1-2 1-2 3m0 3h.01"/></symbol>
+    <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m7 10 5 5 5-5"/></symbol>
+    <symbol id="i-swap" viewBox="0 0 24 24"><path d="M4 8h15l-4-4M20 16H5l4 4"/></symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l2 2m10 10 2 2M5 19l2-2M17 7l2-2"/></symbol>
+    <symbol id="i-tilt" viewBox="0 0 24 24"><circle cx="12" cy="12" r="7"/><path d="m8 2 8 20M5 15l14-6"/></symbol>
+    <symbol id="i-eccentric" viewBox="0 0 24 24"><ellipse cx="12" cy="12" rx="10" ry="6" transform="rotate(-25 12 12)"/><circle cx="7" cy="14" r="1.5" fill="currentColor"/></symbol>
+    <symbol id="i-perihelion" viewBox="0 0 24 24"><ellipse cx="12" cy="12" rx="10" ry="7"/><circle cx="7" cy="12" r="1.5" fill="currentColor"/><path d="M9 12h9m-3-3 3 3-3 3"/></symbol>
+    <symbol id="i-latitude" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><ellipse cx="12" cy="12" rx="4" ry="9"/><path d="M3 12h18M5 7h14M5 17h14"/></symbol>
+    <symbol id="i-minus" viewBox="0 0 24 24"><path d="M5 12h14"/></symbol><symbol id="i-plus" viewBox="0 0 24 24"><path d="M5 12h14m-7-7v14"/></symbol>
   </defs></svg>
   <div class="app-shell" id="app">
-    <header class="app-bar">
-      <a class="brand" href="./" aria-label="Analemma Lab 처음으로"><svg class="icon brand-icon"><use href="#i-orbit"/></svg><span>ANALEMMA <b>LAB</b></span></a>
-      <span class="bar-divider"></span><span class="document-name">태양계 관측 실험</span>
-      <nav class="app-actions" aria-label="앱 도구">
-        <button id="reset" class="text-button" title="지구 기본 설정으로 초기화"><svg class="icon"><use href="#i-reset"/></svg><span>초기화</span></button>
-        <button id="help" class="text-button">사용 안내 <span class="key-hint">?</span></button>
-        <button id="fullscreen" class="icon-button" title="전체 화면 (F)" aria-label="전체 화면"><svg class="icon"><use href="#i-expand"/></svg></button>
-      </nav>
-    </header>
     <main class="workspace">
-      <section class="viewport" id="viewport" aria-label="시뮬레이션 작업 화면">
-        <canvas id="scene" tabindex="0" aria-label="태양 관측 시뮬레이션. 드래그 또는 화살표로 시점 이동, 휠 또는 더하기·빼기로 확대 및 축소."></canvas>
-        <div class="view-bar">
-          <div class="view-tabs" role="group" aria-label="보기 선택">
-            <button data-view="sky" class="active" aria-pressed="true"><svg class="icon"><use href="#i-sky"/></svg>관측</button>
-            <button data-view="orbit" aria-pressed="false"><svg class="icon"><use href="#i-orbit"/></svg>궤도</button>
-            <button data-view="graph" aria-pressed="false"><svg class="icon"><use href="#i-chart"/></svg>그래프</button>
-          </div>
-          <button id="panelToggle" class="icon-button surface-button" aria-label="속성 패널 숨기기" aria-expanded="true" aria-controls="inspector" title="속성 패널"><svg class="icon"><use href="#i-panel"/></svg></button>
-        </div>
-        <aside class="object-panel" aria-label="행성 선택"><div class="panel-heading">태양계 <span>8</span></div><div id="presets" class="object-list"></div><div class="object-footer"><span class="sun-dot"></span>태양 <span>중심 천체</span></div></aside>
-        <div class="scene-caption" aria-live="polite"><span class="caption-kicker" id="viewCaption">지표면 관측</span><strong id="sceneTitle">지구에서 본 태양</strong><span id="sceneSubtitle">평균태양시 12:00 · 30°N</span></div>
-        <div class="scene-tools" role="group" aria-label="화면 도구">
-          <button id="gridToggle" class="icon-button active" title="좌표 격자 (G)" aria-label="좌표 격자" aria-pressed="true"><svg class="icon"><use href="#i-grid"/></svg></button>
-          <button id="trailToggle" class="icon-button active" title="연간 궤적 (T)" aria-label="연간 궤적" aria-pressed="true"><svg class="icon"><use href="#i-trail"/></svg></button>
-          <span class="tool-separator"></span><button id="zoomIn" class="icon-button" title="확대 (+)" aria-label="확대">+</button><button id="zoomOut" class="icon-button" title="축소 (−)" aria-label="축소">−</button><button id="fit" class="icon-button" title="시점 맞춤 (R)" aria-label="시점 맞춤"><svg class="icon"><use href="#i-fit"/></svg></button>
-        </div>
-        <div class="mini-orbit" id="miniOrbit"><div class="mini-heading">공전 위치 <span id="orbitDistance">1.000 a</span></div><canvas id="orbitInset" aria-label="현재 공전 위치"></canvas><div class="mini-foot">근일점 기준 <span id="orbitAngle">0.0°</span></div></div>
-        <div class="scene-legend" id="legend" aria-label="궤적 범례"></div>
-        <div class="view-notice" id="viewNotice" hidden></div>
-        <div class="scene-status"><span id="cameraLabel">시야 95°</span><span id="gestureHint">드래그 시점 이동 <i>·</i> 휠 확대</span></div>
+      <section class="viewport" id="viewport" aria-label="시뮬레이션">
+        <canvas id="scene" tabindex="0" aria-label="태양 관측. 드래그와 화살표로 이동, 휠·핀치·더하기·빼기로 확대 및 축소."></canvas>
+        <nav class="planet-picker" id="presets" aria-label="행성 선택"></nav>
+        <button class="context-view" id="contextSwap" aria-label="궤도 크게 보기" title="궤도 크게 보기">
+          <canvas id="contextScene" aria-hidden="true"></canvas><span class="swap-mark"><svg class="icon" aria-hidden="true"><use href="#i-swap"/></svg></span>
+        </button>
+        <section class="analysis-panel" id="analysisPanel" aria-label="아날렘마 그래프" hidden>
+          <header><span>아날렘마</span><div><button id="expandGraph" class="icon-button" aria-label="그래프 확대" title="그래프 확대" aria-pressed="false"><svg class="icon" aria-hidden="true"><use href="#i-expand"/></svg></button><button id="closeGraph" class="icon-button" aria-label="그래프 닫기" title="그래프 닫기" ><svg class="icon" aria-hidden="true"><use href="#i-close"/></svg></button></div></header>
+          <canvas id="plotScene" tabindex="0" aria-label="방위각–고도 그래프. 드래그로 이동, 휠·핀치로 확대. 더블 클릭으로 초기 시점."></canvas>
+        </section>
+        <div class="scene-legend" id="legend" aria-label="위도 범례" hidden></div>
+        <button id="findSun" class="find-sun" hidden><svg class="icon" aria-hidden="true"><use href="#i-sun"/></svg><span>태양 찾기</span></button>
       </section>
-      <aside class="inspector" id="inspector" aria-label="시뮬레이션 속성">
-        <div class="inspector-heading"><span>속성</span><button id="closePanel" class="icon-button" aria-label="속성 패널 닫기"><svg class="icon"><use href="#i-close"/></svg></button></div>
+      <aside class="inspector" id="inspector" aria-label="행성 속성">
+        <header class="selected-object"><span id="selectedPlanet" class="planet earth" aria-hidden="true"></span><h1 id="planetName">지구</h1><span id="modified" class="modified" title="기본값에서 수정됨" aria-label="기본값에서 수정됨" hidden></span><button id="restorePreset" class="icon-button" aria-label="행성 기본값 복원" title="행성 기본값 복원" ><svg class="icon" aria-hidden="true"><use href="#i-reset"/></svg></button><button id="closePanel" class="icon-button" aria-label="속성 패널 닫기" title="속성 패널 닫기" ><svg class="icon" aria-hidden="true"><use href="#i-close"/></svg></button></header>
         <div class="inspector-scroll">
-          <div class="selected-object"><span id="selectedPlanet" class="planet earth"></span><div><h1 id="planetName">지구</h1><span id="planetEnglish">Earth</span></div><span id="modified" class="modified" hidden>수정됨</span></div>
-          <section class="property-section"><div class="section-heading"><h2>궤도와 자전</h2><button id="restorePreset" class="small-button" title="선택한 행성의 기본값 복원">기본값</button></div><div id="orbitalProperties"></div></section>
-          <section class="property-section"><div class="section-heading"><h2>관측자</h2><span class="section-meta">평균태양시 12:00</span></div><div id="observerProperties"></div><label class="check-row"><input type="checkbox" id="compareToggle"><span>다른 위도와 비교</span></label><div class="comparison-label">0° · 30°N · 60°N · 89°N</div></section>
-          <section class="property-section readings-section"><div class="section-heading"><h2>현재 관측값</h2><span class="section-meta" id="samplePhase">공전 0.0%</span></div><dl class="readings"><div><dt>태양 고도</dt><dd id="currentAlt">—</dd></div><div><dt>방위각</dt><dd id="currentAz">—</dd></div><div><dt>균시차</dt><dd id="currentEot">—</dd></div></dl><div class="visibility-state" id="visibilityState">지평선 위</div></section>
-          <section class="property-section annual-section"><div class="section-heading"><h2>1공전 통계</h2><span class="section-meta">선택 위도</span></div><dl class="readings"><div><dt>고도 변화 폭</dt><dd id="statAlt">—</dd></div><div><dt>방위각 변화 폭</dt><dd id="statAz">—</dd></div><div><dt>균시차 변화 폭</dt><dd id="statEot">—</dd></div></dl></section>
-          <details class="planet-description"><summary>행성 특성</summary><p id="planetDescription"></p></details>
+          <div id="properties" class="properties"></div>
+          <dl class="live-readings" aria-label="현재 관측값"><div><dt>고도</dt><dd id="currentAlt">—</dd></div><div><dt>방위각</dt><dd id="currentAz">—</dd></div><div><dt>균시차</dt><dd id="currentEot">—</dd></div></dl>
+          <span id="visibilityState" class="below-horizon" hidden>지평선 아래</span>
+          <details id="annualStats" class="annual-stats"><summary>변화 범위 <svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></summary><dl><div><dt>고도</dt><dd id="statAlt">—</dd></div><div><dt>방위각</dt><dd id="statAz">—</dd></div><div><dt>균시차</dt><dd id="statEot">—</dd></div></dl></details>
         </div>
-        <div class="inspector-footer"><span class="model-dot"></span>케플러 궤도 모델 <a href="https://github.com/dohye0508/analemma-lab" target="_blank" rel="noopener noreferrer" aria-label="GitHub 소스 코드">소스 ↗</a></div>
       </aside>
     </main>
-    <footer class="transport" aria-label="시간 제어">
-      <div class="transport-main">
-        <div class="playback"><button id="restart" class="icon-button" title="근일점으로 돌아가기" aria-label="근일점으로 돌아가기"><svg class="icon"><use href="#i-reset"/></svg></button><button id="stepBack" class="icon-button" title="공전 1% 이전" aria-label="공전 1% 이전"><svg class="icon"><use href="#i-back"/></svg></button><button id="play" class="play-button" title="재생 / 일시 정지 (Space)" aria-label="재생"><svg class="icon"><use id="playIcon" href="#i-play"/></svg></button><button id="stepForward" class="icon-button" title="공전 1% 다음" aria-label="공전 1% 다음"><svg class="icon"><use href="#i-next"/></svg></button></div>
-        <div class="time-readout"><span id="playState">일시 정지</span><strong><span id="phaseValue">0.0</span><small>%</small><span class="time-separator">/</span><small>1공전</small></strong></div>
-        <div class="timeline"><label class="sr-only" for="phase">공전 진행률</label><input id="phase" type="range" min="0" max="100" step="0.01" value="0"><div class="timeline-labels"><span>근일점 · 0%</span><span>25%</span><span>원일점 · 50%</span><span>75%</span><span>100%</span></div></div>
-        <label class="speed-control"><span>재생 속도</span><select id="speed" aria-label="재생 속도"><option value="0.02">1공전 / 50초</option><option value="0.05" selected>1공전 / 20초</option><option value="0.1">1공전 / 10초</option><option value="0.2">1공전 / 5초</option></select></label>
+    <footer class="transport" aria-label="시뮬레이션 도구">
+      <div class="timeline"><label class="sr-only" for="phase">공전 진행률</label><input id="phase" type="range" min="0" max="100" step="0.01" value="0"></div>
+      <div class="time-controls" role="group" aria-label="시간 제어">
+        <div class="playback"><button id="stepBack" class="icon-button" aria-label="공전 1% 이전" title="공전 1% 이전" ><svg class="icon" aria-hidden="true"><use href="#i-back"/></svg></button><button id="play" class="play-button" aria-label="재생" title="재생 / 정지 (Space)"><svg class="icon" aria-hidden="true"><use id="playIcon" href="#i-play"/></svg></button><button id="stepForward" class="icon-button" aria-label="공전 1% 다음" title="공전 1% 다음" ><svg class="icon" aria-hidden="true"><use href="#i-next"/></svg></button></div>
+        <output class="phase-readout" title="공전 진행률"><span id="phaseValue">0.0</span><span>%</span></output>
+        <select id="speed" aria-label="재생 속도, 1배는 1공전당 20초" title="재생 속도 · 1× = 1공전 / 20초"><option value="0.02">0.4×</option><option value="0.05" selected>1×</option><option value="0.1">2×</option><option value="0.2">4×</option></select>
       </div>
-      <div class="status-bar"><span><span id="statusPlanet">지구</span><i>·</i>평균태양시 고정 관측</span><span id="statusMessage">Space 재생 / 정지<i>·</i>R 시점 맞춤<i>·</i>? 사용 안내</span><span class="status-model">기하학적 모델 · 대기 굴절 제외</span></div>
+      <nav class="tool-dock" aria-label="화면 도구">
+        <div class="tool-group">
+          <button id="cameraToggle" class="icon-button" aria-label="궤도 크게 보기" title="궤도 크게 보기" aria-pressed="false"><svg class="icon" aria-hidden="true"><use href="#i-orbit"/></svg></button>
+          <button id="graphToggle" class="icon-button" aria-label="그래프 열기 (3)" title="그래프 열기 (3)" aria-expanded="false" aria-controls="analysisPanel"><svg class="icon" aria-hidden="true"><use href="#i-chart"/></svg></button>
+          <button id="compareToggle" class="icon-button" aria-label="위도 비교: 0°, 30°N, 60°N, 89°N" title="위도 비교: 0°, 30°N, 60°N, 89°N" aria-pressed="false"><svg class="icon" aria-hidden="true"><use href="#i-compare"/></svg></button>
+        </div>
+        <div class="tool-group">
+          <button id="gridToggle" class="icon-button" aria-label="격자 (G)" title="격자 (G)" aria-pressed="false"><svg class="icon" aria-hidden="true"><use href="#i-grid"/></svg></button>
+          <button id="trailToggle" class="icon-button" aria-label="궤적 (T)" title="궤적 (T)" aria-pressed="true"><svg class="icon" aria-hidden="true"><use href="#i-trail"/></svg></button>
+        </div>
+        <div class="tool-group">
+          <button id="zoomOut" class="icon-button" aria-label="축소 (−)" title="축소 (−)" ><svg class="icon" aria-hidden="true"><use href="#i-minus"/></svg></button>
+          <button id="zoomIn" class="icon-button" aria-label="확대 (+)" title="확대 (+)" ><svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg></button>
+          <button id="fit" class="icon-button" aria-label="시점 맞춤 (R)" title="시점 맞춤 (R)" ><svg class="icon" aria-hidden="true"><use href="#i-fit"/></svg></button>
+        </div>
+        <div class="tool-group">
+          <button id="reset" class="icon-button" aria-label="시뮬레이션 초기화" title="시뮬레이션 초기화" ><svg class="icon" aria-hidden="true"><use href="#i-reset"/></svg></button>
+          <button id="fullscreen" class="icon-button" aria-label="전체 화면 (F)" title="전체 화면 (F)" aria-pressed="false"><svg class="icon" aria-hidden="true"><use href="#i-expand"/></svg></button>
+          <button id="help" class="icon-button" aria-label="도움말 (?)" title="도움말 (?)" ><svg class="icon" aria-hidden="true"><use href="#i-help"/></svg></button>
+          <button id="panelToggle" class="icon-button" aria-label="속성 패널 숨기기" title="속성 패널 숨기기" aria-expanded="true" aria-controls="inspector"><svg class="icon" aria-hidden="true"><use href="#i-settings"/></svg></button>
+        </div>
+      </nav>
     </footer>
   </div>
-  <dialog id="helpDialog" aria-labelledby="helpTitle"><div class="dialog-heading"><h2 id="helpTitle">아날렘마 관측하기</h2><button id="closeHelp" class="icon-button" aria-label="사용 안내 닫기"><svg class="icon"><use href="#i-close"/></svg></button></div><div class="dialog-body"><p>같은 장소에서 <b>매일 같은 평균태양시</b>에 태양을 관측하면, 1년 동안 하늘에 하나의 궤적이 만들어집니다. 이 시뮬레이터는 평균태양시 정오의 태양 위치를 공전 주기 전체에 걸쳐 계산합니다.</p><ol><li>왼쪽에서 행성을 선택합니다.</li><li>오른쪽에서 자전축, 이심률, 근일점 방향과 위도를 조정합니다.</li><li>재생하거나 시간 막대를 움직여 태양과 공전 위치를 함께 확인합니다.</li><li>관측·궤도·그래프 보기를 전환하며 같은 계산 결과를 살펴봅니다.</li></ol><h3>조작</h3><dl class="shortcut-list"><div><dt>드래그 / 화살표</dt><dd>시점 이동 (캔버스 선택)</dd></div><div><dt>휠 / + / −</dt><dd>확대·축소</dd></div><div><dt>Space</dt><dd>재생·일시 정지</dd></div><div><dt>R / G / T</dt><dd>시점 맞춤 / 격자 / 연간 궤적</dd></div><div><dt>1 / 2 / 3</dt><dd>관측 / 궤도 / 그래프</dd></div><div><dt>F / Esc</dt><dd>전체 화면 / 닫기</dd></div></dl><h3>모델과 단위</h3><p>케플러 방정식 <span class="formula">M = E − e sin E</span>을 풀어 태양의 적위와 균시차, 방위각·고도를 구합니다. 근일점 방향은 기존 모델의 태양 황경 기준 매개변수입니다. 공전 0%는 근일점 통과 시점이며, 달력 날짜나 실제 날짜별 관측 예보를 뜻하지 않습니다.</p><p>균시차는 모든 행성에서 비교할 수 있도록 각도(°)로 표시합니다. 궤도 보기의 거리 단위 <b>a</b>는 궤도 긴반지름입니다. 천체 크기는 보기 쉽게 확대했습니다. 자전 주기·공전 주기의 공명, 대기 굴절, 실제 지형은 모델에 포함하지 않습니다. 위도는 극점의 방위각 특이점을 피해 ±89°까지 계산합니다.</p></div></dialog>
+  <dialog id="helpDialog" aria-labelledby="helpTitle">
+    <header class="dialog-heading"><h2 id="helpTitle">사용법</h2><button id="closeHelp" class="icon-button" aria-label="도움말 닫기" title="도움말 닫기" ><svg class="icon" aria-hidden="true"><use href="#i-close"/></svg></button></header>
+    <div class="dialog-body">
+      <p>같은 장소, 같은 평균태양시 정오의 태양을 한 공전 동안 관측합니다.</p>
+      <dl class="shortcut-list"><div><dt>드래그 · 화살표</dt><dd>시점 이동</dd></div><div><dt>휠 · 핀치 · + / −</dt><dd>확대·축소</dd></div><div><dt>Space</dt><dd>재생·정지</dd></div><div><dt>R</dt><dd>시점 맞춤</dd></div><div><dt>1 / 2 / 3</dt><dd>관측 / 궤도 / 그래프 펼치기</dd></div><div><dt>G / T / F</dt><dd>격자 / 궤적 / 전체 화면</dd></div></dl>
+      <details><summary>선택한 행성</summary><p id="planetDescription"></p></details>
+      <details><summary>계산과 단위</summary><p>공전 0%는 근일점, 50%는 원일점입니다. 실제 달력 날짜나 하루 동안의 운동을 뜻하지 않습니다. 재생 속도 1×에서 한 공전은 20초입니다.</p><p>케플러 방정식 M = E − e sin E로 태양의 적위·균시차·방위각·고도를 계산합니다. 균시차 단위는 각도(°), 근일점 방향은 기존 모델의 태양 황경 기준입니다. 위도는 극점의 방위각 특이점을 피해 ±89°까지 계산합니다.</p><p>궤도 거리의 기준은 긴반지름 a이며 천체 크기는 확대했습니다. 대기 굴절, 실제 지형, 자전·공전 공명은 포함하지 않습니다. 지평선 아래 궤적은 점선입니다.</p></details>
+      <a href="https://github.com/dohye0508/analemma-lab" target="_blank" rel="noopener noreferrer">소스 코드 ↗</a>
+    </div>
+  </dialog>
   <div class="toast" id="toast" role="status" hidden></div>
 </body>
 </html>
